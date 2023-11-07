@@ -25,7 +25,7 @@ public class SchedulerService {
     }
 
     public boolean isScheduled(String id) {
-        return schedulers.containsKey(id);
+        return schedulers.containsKey(id) && schedulers.get(id) != null;
     }
 
     public void schedule(String id, String cron, Runnable runnable) {
@@ -38,7 +38,7 @@ public class SchedulerService {
     }
 
     public void cancel(String id) {
-        if (isScheduled(id) && schedulers.get(id) != null) {
+        if (isScheduled(id)) {
             logger.info(id + " was already scheduled, it will be removed");
             schedulers.get(id).cancel(false);
         }
