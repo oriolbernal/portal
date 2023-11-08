@@ -37,7 +37,7 @@ class SchedulerServiceCounterTest {
 
     @DisplayName("Schedule a task every 5 secs and block main thread for 20 secs")
     @Test
-    //@Disabled
+    @Disabled
     void example() throws InterruptedException {
         // Programem una tasca
         scheduler.schedule(

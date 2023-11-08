@@ -40,15 +40,19 @@ public class MonitorServiceImpl implements MonitorService {
 
     private void schedule(Monitor monitor) {
         logger.info("Scheduling monitor: {} and cron {}", monitor.getId(), monitor.getCron());
-        Runnable runnable = () -> {
+        if (monitor.isActive()) {
+            scheduler.schedule(monitor.getId(), monitor.getCron(), runnable(monitor));
+        }
+    }
+
+    private Runnable runnable(Monitor monitor) {
+        return () -> {
             logger.info("Executing monitor: {} at {}", monitor.getId(), LocalDateTime.now());
             Execution execution = monitor.run();
             logger.info("Execution finished for monitor: {} in {} seconds", monitor.getId(), execution.getElapsedTimeInSeconds());
         };
-        if (monitor.isActive()) {
-            scheduler.schedule(monitor.getId(), monitor.getCron(), runnable);
-        }
     }
+
     @Override
     public Monitor create(Monitor monitor) {
         String id = UUID.randomUUID().toString();
@@ -77,10 +81,10 @@ public class MonitorServiceImpl implements MonitorService {
     @Override
     public Monitor toggle(String id) throws NotFoundException {
         Monitor monitor = findById(id);
-        if(monitor.isActive()) {
+        if (monitor.isActive()) {
             logger.debug("Disabling monitor: {}", id);
             scheduler.cancel(monitor.getId());
-        }else {
+        } else {
             logger.debug("Enabling monitor {}", id);
             schedule(monitor);
         }
