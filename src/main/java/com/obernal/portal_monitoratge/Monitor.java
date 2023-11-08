@@ -2,8 +2,8 @@ package com.obernal.portal_monitoratge;
 
 public interface Monitor {
 
-    Execution run();
     String getId();
+    Execution run();
     String getCron();
     void update(Object data);
     void toggle();

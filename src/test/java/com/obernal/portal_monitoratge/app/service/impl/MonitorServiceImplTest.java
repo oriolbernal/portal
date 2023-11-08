@@ -173,24 +173,22 @@ class DummyMonitor implements Monitor {
     }
 }
 
-class DummyExecution extends Execution {
+class DummyExecution implements Execution {
+
+    private final String id;
+    private final float elapsedTimeInSeconds;
 
     public DummyExecution(long start) {
-        super(start);
+        this.id = UUID.randomUUID().toString();
+        this.elapsedTimeInSeconds = (System.currentTimeMillis() - start) / 1000F;
+    }
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
-    public boolean isAlert() {
-        return false;
-    }
-
-    @Override
-    public boolean isError() {
-        return false;
-    }
-
-    @Override
-    public String getErrorMessage() {
-        return "";
+    public float getElapsedTimeInSeconds() {
+        return elapsedTimeInSeconds;
     }
 }
