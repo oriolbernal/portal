@@ -1,8 +1,9 @@
 package com.obernal.portal_monitoratge.app.service;
 
-import com.obernal.portal_monitoratge.Execution;
-import com.obernal.portal_monitoratge.Monitor;
+import com.obernal.portal_monitoratge.model.Execution;
+import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
+import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 
 import java.util.stream.Stream;
 
@@ -16,7 +17,7 @@ public interface MonitorService {
 
     Monitor findById(String id) throws NotFoundException;
 
-    Monitor update(String id, Object metadata) throws NotFoundException;
+    Monitor update(String id, MonitorContext context) throws NotFoundException;
 
     Monitor toggle(String id) throws NotFoundException;
 

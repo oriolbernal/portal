@@ -1,4 +1,4 @@
-package com.obernal.portal_monitoratge;
+package com.obernal.portal_monitoratge.model;
 
 public interface Notification {
 
@@ -6,5 +6,6 @@ public interface Notification {
     Alert alert();
     Alert insist();
     Alert recovery();
+    void error();
 
 }

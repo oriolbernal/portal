@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.app.persistence;
 
-import com.obernal.portal_monitoratge.Monitor;
+import com.obernal.portal_monitoratge.model.monitor.Monitor;
 
 import java.util.Optional;
 import java.util.stream.Stream;

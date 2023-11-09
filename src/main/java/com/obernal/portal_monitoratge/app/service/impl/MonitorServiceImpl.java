@@ -1,10 +1,11 @@
 package com.obernal.portal_monitoratge.app.service.impl;
 
-import com.obernal.portal_monitoratge.Execution;
-import com.obernal.portal_monitoratge.Monitor;
+import com.obernal.portal_monitoratge.model.Execution;
+import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 import com.obernal.portal_monitoratge.app.service.MonitorService;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
+import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,10 +71,10 @@ public class MonitorServiceImpl implements MonitorService {
     }
 
     @Override
-    public Monitor update(String id, Object data) throws NotFoundException {
+    public Monitor update(String id, MonitorContext context) throws NotFoundException {
         logger.debug("Monitor Service: Updating monitor {}", id);
         Monitor existingMonitor = findById(id);
-        existingMonitor.update(data);
+        existingMonitor.update(context);
         schedule(existingMonitor);
         return persistence.update(existingMonitor);
     }

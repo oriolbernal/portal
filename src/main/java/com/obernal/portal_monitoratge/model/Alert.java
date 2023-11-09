@@ -1,4 +1,4 @@
-package com.obernal.portal_monitoratge;
+package com.obernal.portal_monitoratge.model;
 
 public interface Alert {
 

@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.app.persistence.impl;
 
-import com.obernal.portal_monitoratge.Monitor;
+import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 
 import java.util.Map;

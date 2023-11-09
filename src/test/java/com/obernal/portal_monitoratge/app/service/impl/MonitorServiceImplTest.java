@@ -1,10 +1,12 @@
 package com.obernal.portal_monitoratge.app.service.impl;
 
-import com.obernal.portal_monitoratge.Execution;
-import com.obernal.portal_monitoratge.Monitor;
+import com.obernal.portal_monitoratge.model.Execution;
+import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 import com.obernal.portal_monitoratge.app.service.MonitorService;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
+import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
+import com.obernal.portal_monitoratge.model.monitor.MonitorType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -81,7 +83,8 @@ class MonitorServiceImplTest {
         Monitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
         when(persistence.update(any(Monitor.class))).thenReturn(existingMonitor);
-        Monitor updatedMonitor = service.update("existing_id", "new cron");
+        MonitorContext metadata = new MonitorContext(MonitorType.SSL, "", "", "new cron", "", new HashSet<>(), "", false);
+        Monitor updatedMonitor = service.update("existing_id", metadata);
         assertNotNull(updatedMonitor);
         assertEquals("new cron", updatedMonitor.getCron());
     }
@@ -130,65 +133,21 @@ class MonitorServiceImplTest {
 
 }
 
-class DummyMonitor implements Monitor {
-
-    private final String id;
-    private String cron;
-    private boolean active;
+class DummyMonitor extends Monitor<Object> {
 
     public DummyMonitor(String id, String cron, boolean active) {
-        this.id = id;
-        this.cron = cron;
-        this.active = active;
+        super(id, new MonitorContext(MonitorType.SSL, "", "", cron, "", new HashSet<>(), "", active) {
+        });
     }
 
     @Override
-    public Execution run() {
-        return new DummyExecution(System.currentTimeMillis());
+    public Object perform() {
+        return null;
     }
 
     @Override
-    public String getId() {
-        return id;
+    public boolean isAlert() {
+        return false;
     }
 
-    @Override
-    public String getCron() {
-        return cron;
-    }
-
-    @Override
-    public void update(Object data) {
-        this.cron = data.toString();
-    }
-
-    @Override
-    public void toggle() {
-        this.active = !active;
-    }
-
-    @Override
-    public boolean isActive() {
-        return active;
-    }
-}
-
-class DummyExecution implements Execution {
-
-    private final String id;
-    private final float elapsedTimeInSeconds;
-
-    public DummyExecution(long start) {
-        this.id = UUID.randomUUID().toString();
-        this.elapsedTimeInSeconds = (System.currentTimeMillis() - start) / 1000F;
-    }
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public float getElapsedTimeInSeconds() {
-        return elapsedTimeInSeconds;
-    }
 }
