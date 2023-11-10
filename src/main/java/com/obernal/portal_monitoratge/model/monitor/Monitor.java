@@ -5,13 +5,13 @@ import com.obernal.portal_monitoratge.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class Monitor<R> implements Task<Execution> {
+public abstract class Monitor<C extends MonitorContext, R> implements Task<Execution> {
     private static final Logger logger = LoggerFactory.getLogger(Monitor.class);
 
     private final String id;
-    private MonitorContext context;
+    protected C context;
 
-    protected Monitor(String id, MonitorContext context) {
+    protected Monitor(String id, C context) {
         this.id = id;
         this.context = context;
     }
@@ -42,7 +42,7 @@ public abstract class Monitor<R> implements Task<Execution> {
         return context.getCron();
     }
 
-    public void update(MonitorContext context) {
+    public void update(C context) {
         this.context = context;
     }
 

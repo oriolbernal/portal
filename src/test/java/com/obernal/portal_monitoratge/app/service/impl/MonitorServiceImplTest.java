@@ -133,21 +133,34 @@ class MonitorServiceImplTest {
 
 }
 
-class DummyMonitor extends Monitor<Object> {
+class DummyMonitor extends Monitor<DummyContext, Object> {
 
     public DummyMonitor(String id, String cron, boolean active) {
-        super(id, new MonitorContext(MonitorType.SSL, "", "", cron, "", new HashSet<>(), "", active) {
-        });
+        super(id, new DummyContext(cron, active));
     }
 
     @Override
     public Object perform() {
+        System.out.println("this is a dummy performance");
         return null;
     }
 
     @Override
     public boolean isAlert() {
-        return false;
+        return context.getRandom() >= 0.5;
     }
 
+}
+
+class DummyContext extends MonitorContext {
+
+    private final double random;
+    public DummyContext(String cron, boolean active) {
+        super(MonitorType.SSL, "name", "description", cron, "service", new HashSet<>(), "documentation", active);
+        random = Math.random(); // greater than or equal to 0.0 and less than 1.0
+    }
+
+    public double getRandom() {
+        return random;
+    }
 }
