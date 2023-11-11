@@ -3,8 +3,6 @@ package com.obernal.portal_monitoratge.model.monitor.impl;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.model.monitor.MonitorType;
 import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbPoolSingleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
