@@ -1,6 +1,7 @@
 package com.obernal.portal_monitoratge.model;
 
-public interface Report {
+public interface Report<R> {
     float getElapsedTimeInSeconds();
+    R getData();
 
 }

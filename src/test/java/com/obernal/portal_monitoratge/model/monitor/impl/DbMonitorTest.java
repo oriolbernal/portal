@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -20,8 +21,21 @@ class DbMonitorTest {
     public void setup() {
         // Mocking the dependencies
         dbPoolSingleton = mock(DbPoolSingleton.class);
-        dbMonitor = new DbMonitor("testId", dbPoolSingleton, "testDatasource",
-                "testQuery", 10L, 20L, "testWord");
+        dbMonitor = new DbMonitor(
+                "id",
+                "name",
+                "desc",
+                "cron",
+                "service",
+                new HashSet<>(),
+                "docs",
+                dbPoolSingleton,
+                "testDatasource",
+                "testQuery",
+                10L,
+                20L,
+                "testWord"
+        );
     }
 
     @Test

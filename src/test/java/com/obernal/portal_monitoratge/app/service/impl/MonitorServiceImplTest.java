@@ -80,46 +80,46 @@ class MonitorServiceImplTest {
 
     @Test
     public void testUpdate() throws NotFoundException {
-        Monitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
+        var existingMonitor = new DummyMonitor("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
         when(persistence.update(any(Monitor.class))).thenReturn(existingMonitor);
         MonitorContext metadata = new MonitorContext(MonitorType.SSL, "", "", "new cron", "", new HashSet<>(), "", false);
-        Monitor updatedMonitor = service.update("existing_id", metadata);
+        var updatedMonitor = service.update("existing_id", metadata);
         assertNotNull(updatedMonitor);
         assertEquals("new cron", updatedMonitor.getCron());
     }
 
     @Test
     public void testToggle_Enable() throws NotFoundException {
-        Monitor existingMonitor = new DummyMonitor("existing_id", "cron1", false);
+        var existingMonitor = new DummyMonitor("existing_id", "cron1", false);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
         when(persistence.update(any(Monitor.class))).thenReturn(existingMonitor);
-        Monitor toggledMonitor = service.toggle("existing_id");
+        var toggledMonitor = service.toggle("existing_id");
         assertNotNull(toggledMonitor);
         assertTrue(toggledMonitor.isActive());
     }
 
     @Test
     public void testToggle_Disable() throws NotFoundException {
-        Monitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
+        DummyMonitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
         when(persistence.update(any(Monitor.class))).thenReturn(existingMonitor);
-        Monitor toggledMonitor = service.toggle("existing_id");
+        Monitor<?> toggledMonitor = service.toggle("existing_id");
         assertNotNull(toggledMonitor);
         assertFalse(toggledMonitor.isActive());
     }
 
     @Test
     public void testDelete() throws NotFoundException {
-        Monitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
+        DummyMonitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
-        Monitor deletedMonitor = service.delete("existing_id");
+        Monitor<?> deletedMonitor = service.delete("existing_id");
         assertNotNull(deletedMonitor);
     }
 
     @Test
     public void testRun() throws NotFoundException {
-        Monitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
+        DummyMonitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
         Execution result = service.run("existing_id");
         assertNotNull(result);
@@ -133,34 +133,32 @@ class MonitorServiceImplTest {
 
 }
 
-class DummyMonitor extends Monitor<DummyContext, Object> {
+class DummyMonitor extends Monitor<Object> {
+    private final double random;
 
     public DummyMonitor(String id, String cron, boolean active) {
-        super(id, new DummyContext(cron, active));
+        super(id,
+                null,
+                "name",
+                "desc",
+                cron,
+                "service",
+                new HashSet<>(),
+                "docs",
+                active
+        );
+        random = Math.random(); // greater than or equal to 0.0 and less than 1.0
     }
 
     @Override
     public Object perform() {
         System.out.println("this is a dummy performance");
-        return null;
+        return random;
     }
 
     @Override
-    public boolean isAlert() {
-        return context.getRandom() >= 0.5;
+    public boolean isAlert(Object result) {
+        return random >= 0.5;
     }
 
-}
-
-class DummyContext extends MonitorContext {
-
-    private final double random;
-    public DummyContext(String cron, boolean active) {
-        super(MonitorType.SSL, "name", "description", cron, "service", new HashSet<>(), "documentation", active);
-        random = Math.random(); // greater than or equal to 0.0 and less than 1.0
-    }
-
-    public double getRandom() {
-        return random;
-    }
 }

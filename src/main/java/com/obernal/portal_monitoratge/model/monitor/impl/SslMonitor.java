@@ -1,7 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor.impl;
 
-import com.obernal.portal_monitoratge.model.Execution;
-import com.obernal.portal_monitoratge.model.Task;
+import com.obernal.portal_monitoratge.model.monitor.Monitor;
+import com.obernal.portal_monitoratge.model.monitor.MonitorType;
 import com.obernal.portal_monitoratge.model.monitor.impl.clients.IgnoreCertificateExpirationTrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +19,11 @@ import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Set;
 
-public class SslMonitor implements Task<Execution> {
+public class SslMonitor extends Monitor<SslResult> {
+    private static final Logger logger = LoggerFactory.getLogger(SslMonitor.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(DbMonitor.class);
-
-    private final String id;
     private final String endpoint;
     private final RequestMethod method;
     private final HttpRequest.BodyPublisher publisher;
@@ -34,8 +33,8 @@ public class SslMonitor implements Task<Execution> {
     private final SSLParameters sslParameters;
     private final int daysInAdvance;
 
-    public SslMonitor(String id, String endpoint, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, int daysInAdvance) {
-        this.id = id;
+    public SslMonitor(String id, String name, String description, String cron, String service, Set<String> labels, String documentation, String endpoint, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, int daysInAdvance) {
+        super(id, MonitorType.DB, name, description, cron, service, labels, documentation, true);
         this.endpoint = endpoint;
         this.method = RequestMethod.GET;
         this.publisher = null;
@@ -48,25 +47,7 @@ public class SslMonitor implements Task<Execution> {
     }
 
     @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public Execution run() {
-        logger.info("Executing monitor: {}", id);
-        long start = System.currentTimeMillis();
-        try {
-            SslResult result = compute();
-            boolean alert = isAlert(result);
-            return new Execution(start, alert);
-        } catch (Exception exception) {
-            logger.error("Error executing monitor: {} --> {}", id, exception.getMessage(), exception);
-            return new Execution(start, exception);
-        }
-    }
-
-    private SslResult compute() throws InterruptedException {
+    protected SslResult perform() throws Exception {
         HttpClient client = getClient();
         HttpRequest request = getRequest();
         try {
@@ -152,17 +133,18 @@ public class SslMonitor implements Task<Execution> {
         };
     }
 
-    private enum RequestMethod {
-        GET,  POST, PUT, DELETE, HEAD, PATCH, OPTIONS, TRACE;
-    }
-
-    private boolean isAlert(SslResult result) {
+    @Override
+    protected boolean isAlert(SslResult result) throws Exception {
         if (result.getSSLExpirationDate(0).isEmpty()) {
             throw new RuntimeException("SSL certificate not found");
         }
         LocalDateTime certificateExpiration = result.getSSLExpirationDate(0).get();
         LocalDateTime alertDate = LocalDateTime.now().plusDays(daysInAdvance);
         return alertDate.isAfter(certificateExpiration);
+    }
+
+    private enum RequestMethod {
+        GET,  POST, PUT, DELETE, HEAD, PATCH, OPTIONS, TRACE;
     }
 
 }
