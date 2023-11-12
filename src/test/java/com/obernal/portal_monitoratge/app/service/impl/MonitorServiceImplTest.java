@@ -5,8 +5,7 @@ import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 import com.obernal.portal_monitoratge.app.service.MonitorService;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
-import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
-import com.obernal.portal_monitoratge.model.monitor.MonitorType;
+import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -83,7 +82,7 @@ class MonitorServiceImplTest {
         var existingMonitor = new DummyMonitor("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
         when(persistence.update(any(Monitor.class))).thenReturn(existingMonitor);
-        MonitorContext metadata = new MonitorContext(MonitorType.SSL, "", "", "new cron", "", new HashSet<>(), "", false);
+        DummyMonitorMetadata metadata = new DummyMonitorMetadata("id", "new cron", false);
         var updatedMonitor = service.update("existing_id", metadata);
         assertNotNull(updatedMonitor);
         assertEquals("new cron", updatedMonitor.getCron());
@@ -104,7 +103,7 @@ class MonitorServiceImplTest {
         DummyMonitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
         when(persistence.update(any(Monitor.class))).thenReturn(existingMonitor);
-        Monitor<?> toggledMonitor = service.toggle("existing_id");
+        Monitor toggledMonitor = service.toggle("existing_id");
         assertNotNull(toggledMonitor);
         assertFalse(toggledMonitor.isActive());
     }
@@ -113,7 +112,7 @@ class MonitorServiceImplTest {
     public void testDelete() throws NotFoundException {
         DummyMonitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
-        Monitor<?> deletedMonitor = service.delete("existing_id");
+        Monitor deletedMonitor = service.delete("existing_id");
         assertNotNull(deletedMonitor);
     }
 
@@ -133,32 +132,34 @@ class MonitorServiceImplTest {
 
 }
 
-class DummyMonitor extends Monitor<Object> {
-    private final double random;
+class DummyMonitor extends Monitor<DummyMonitorMetadata, Object> {
 
-    public DummyMonitor(String id, String cron, boolean active) {
-        super(id,
-                null,
-                "name",
-                "desc",
-                cron,
-                "service",
-                new HashSet<>(),
-                "docs",
-                active
-        );
-        random = Math.random(); // greater than or equal to 0.0 and less than 1.0
+    public DummyMonitor(String id, String cron, boolean alert) {
+        super(new DummyMonitorMetadata(id, cron, alert));
     }
 
     @Override
     public Object perform() {
         System.out.println("this is a dummy performance");
-        return random;
+        return metadata.getRandom();
     }
 
     @Override
     public boolean isAlert(Object result) {
-        return random >= 0.5;
+        return metadata.getRandom() >= 0.5;
     }
 
+}
+
+class DummyMonitorMetadata extends MonitorMetadata {
+    private final double random;
+
+    public DummyMonitorMetadata(String id, String cron, boolean active) {
+        super(id, null, null, null, "name", "description", cron, "service", new HashSet<>(), "documentation", active);
+        random = Math.random(); // greater than or equal to 0.0 and less than 1.0
+    }
+
+    public double getRandom() {
+        return random;
+    }
 }

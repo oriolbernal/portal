@@ -3,7 +3,7 @@ package com.obernal.portal_monitoratge.app.service;
 import com.obernal.portal_monitoratge.model.Execution;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
-import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
+import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 
 import java.util.stream.Stream;
 
@@ -17,7 +17,7 @@ public interface MonitorService {
 
     Monitor findById(String id) throws NotFoundException;
 
-    Monitor update(String id, MonitorContext context) throws NotFoundException;
+    Monitor update(String id, MonitorMetadata metadata) throws NotFoundException;
 
     Monitor toggle(String id) throws NotFoundException;
 

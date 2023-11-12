@@ -4,48 +4,30 @@ import com.obernal.portal_monitoratge.model.Execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-
-public abstract class Monitor<R> implements Task<R> {
+public abstract class Monitor<M extends MonitorMetadata, R> implements Task<R> {
     private static final Logger logger = LoggerFactory.getLogger(Monitor.class);
 
-    private final String id;
-    private MonitorType type;
-    private String name;
-    private String description;
-    private String cron;
-    private String service;
-    private Set<String> labels;
-    private String documentation;
-    private boolean active;
+    protected M metadata;
 
-    protected Monitor(String id, MonitorType type, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active) {
-        this.id = id;
-        this.type = type;
-        this.name = name;
-        this.description = description;
-        this.cron = cron;
-        this.service = service;
-        this.labels = labels;
-        this.documentation = documentation;
-        this.active = active;
+    protected Monitor(M metadata) {
+        this.metadata = metadata;
     }
 
     @Override
     public String getId() {
-        return id;
+        return metadata.getId();
     }
 
     @Override
     public Execution<R> run() {
-        logger.info("Executing monitor: {}", id);
+        logger.info("Executing monitor: {}", getId());
         long start = System.currentTimeMillis();
         try {
             R result = perform();
             boolean alert = isAlert(result);
             return new Execution<>(start, alert, result);
         } catch (Exception exception) {
-            logger.error("Error executing monitor: {} --> {}", id, exception.getMessage(), exception);
+            logger.error("Error executing monitor: {} --> {}", getId(), exception.getMessage(), exception);
             return new Execution<>(start, exception);
         }
     }
@@ -54,26 +36,19 @@ public abstract class Monitor<R> implements Task<R> {
     protected abstract boolean isAlert(R result) throws Exception;
 
     public String getCron() {
-        return cron;
+        return metadata.getCron();
     }
 
-    public void update(MonitorContext context) {
-        type = context.getType();
-        name = context.getName();
-        description = context.getDescription();
-        cron = context.getCron();
-        service = context.getService();
-        labels = context.getLabels();
-        documentation = context.getDocumentation();
-        active = context.isActive();
+    public void update(M metadata) {
+        this.metadata.update(metadata);
     }
 
     public void toggle() {
-        active = !active;
+        metadata.toggle();
     }
 
     public boolean isActive() {
-        return active;
+        return metadata.isActive();
     }
 
 }

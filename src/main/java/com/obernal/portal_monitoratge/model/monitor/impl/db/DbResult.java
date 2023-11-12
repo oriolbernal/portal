@@ -1,4 +1,4 @@
-package com.obernal.portal_monitoratge.model.monitor.impl;
+package com.obernal.portal_monitoratge.model.monitor.impl.db;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

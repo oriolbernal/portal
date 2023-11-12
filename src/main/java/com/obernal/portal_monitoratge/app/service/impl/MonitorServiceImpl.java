@@ -5,7 +5,7 @@ import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 import com.obernal.portal_monitoratge.app.service.MonitorService;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
-import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
+import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +23,7 @@ public class MonitorServiceImpl implements MonitorService {
         this.persistence = persistence;
         this.scheduler = scheduler;
     }
+
 
     @Override
     public Stream<Monitor> findAll() {
@@ -71,10 +72,10 @@ public class MonitorServiceImpl implements MonitorService {
     }
 
     @Override
-    public Monitor update(String id, MonitorContext context) throws NotFoundException {
+    public Monitor update(String id, MonitorMetadata metadata) throws NotFoundException {
         logger.debug("Monitor Service: Updating monitor {}", id);
         Monitor existingMonitor = findById(id);
-        existingMonitor.update(context);
+        existingMonitor.update(metadata);
         schedule(existingMonitor);
         return persistence.update(existingMonitor);
     }

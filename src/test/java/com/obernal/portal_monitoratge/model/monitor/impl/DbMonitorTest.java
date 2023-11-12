@@ -2,10 +2,13 @@ package com.obernal.portal_monitoratge.model.monitor.impl;
 
 import com.obernal.portal_monitoratge.model.Execution;
 import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbPoolSingleton;
+import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMetadata;
+import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,23 +22,23 @@ class DbMonitorTest {
 
     @BeforeEach
     public void setup() {
-        // Mocking the dependencies
         dbPoolSingleton = mock(DbPoolSingleton.class);
-        dbMonitor = new DbMonitor(
-                "id",
+        DbMetadata metadata = new DbMetadata("id",
+                LocalDateTime.now(),
+                LocalDateTime.now(),
                 "name",
                 "desc",
                 "cron",
                 "service",
                 new HashSet<>(),
                 "docs",
-                dbPoolSingleton,
+                true,
                 "testDatasource",
                 "testQuery",
                 10L,
                 20L,
-                "testWord"
-        );
+                "testWord");
+        dbMonitor = new DbMonitor(metadata, dbPoolSingleton);
     }
 
     @Test

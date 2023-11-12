@@ -1,4 +1,4 @@
-package com.obernal.portal_monitoratge.model.monitor.impl;
+package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;

@@ -1,7 +1,6 @@
-package com.obernal.portal_monitoratge.model.monitor.impl;
+package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
-import com.obernal.portal_monitoratge.model.monitor.MonitorType;
 import com.obernal.portal_monitoratge.model.monitor.impl.clients.IgnoreCertificateExpirationTrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,46 +9,27 @@ import javax.net.ssl.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.KeyStore;
-import java.security.SecureRandom;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Set;
 
-public class SslMonitor extends Monitor<SslResult> {
+public class SslMonitor extends Monitor<SslMetadata, SslResult> {
     private static final Logger logger = LoggerFactory.getLogger(SslMonitor.class);
 
-    private final String endpoint;
-    private final RequestMethod method;
-    private final HttpRequest.BodyPublisher publisher;
-    private final int timeOutInSeconds;
-    private final HttpClient.Version version;
-    private final HttpClient.Redirect redirect;
-    private final SSLParameters sslParameters;
-    private final int daysInAdvance;
-
-    public SslMonitor(String id, String name, String description, String cron, String service, Set<String> labels, String documentation, String endpoint, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, int daysInAdvance) {
-        super(id, MonitorType.DB, name, description, cron, service, labels, documentation, true);
-        this.endpoint = endpoint;
-        this.method = RequestMethod.GET;
-        this.publisher = null;
-        this.timeOutInSeconds = timeOutInSeconds;
-        this.version = version;
-        this.redirect = redirect;
-        sslParameters = new SSLParameters();
-        sslParameters.setProtocols(sslProtocols);
-        this.daysInAdvance = daysInAdvance;
+    public SslMonitor(SslMetadata metadata) {
+        super(metadata);
     }
 
     @Override
     protected SslResult perform() throws Exception {
-        HttpClient client = getClient();
-        HttpRequest request = getRequest();
+        HttpClient client = metadata.getClient(
+                getClientAuth("src/main/resources/CDA-1_SGNM_00.p12", "1234"),
+                getTrustManagers()
+        );
+        HttpRequest request = metadata.getRequest();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return new SslResult(response);
@@ -64,31 +44,6 @@ public class SslMonitor extends Monitor<SslResult> {
         } catch (IOException e) {
             throw new RuntimeException("I/O error occurred when sending or receiving: " + e.getMessage());
         }
-    }
-
-    private HttpClient getClient() {
-        return HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(timeOutInSeconds))
-                .version(version)
-                .followRedirects(redirect)
-                .sslContext(getSSLContext())
-                .sslParameters(sslParameters)
-                .build();
-    }
-
-    private static SSLContext getSSLContext() {
-        SSLContext sslContext;
-        try {
-            sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(
-                    getClientAuth("src/main/resources/CDA-1_SGNM_00.p12", "1234"),
-                    getTrustManagers(),
-                    new SecureRandom()
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return sslContext;
     }
 
     private static KeyManager[] getClientAuth(String p12Path, String password) {
@@ -116,35 +71,19 @@ public class SslMonitor extends Monitor<SslResult> {
             }
             return trustManagers;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unable to load trustore manager", e);
             return null;
         }
     }
 
-    private HttpRequest getRequest() {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(endpoint));
-        return switch (method) {
-            case GET -> builder.GET().build();
-            case POST -> builder.POST(publisher).build();
-            case PUT -> builder.PUT(publisher).build();
-            case DELETE -> builder.DELETE().build();
-            default -> builder.method(method.toString(), publisher).build();
-        };
-    }
-
     @Override
-    protected boolean isAlert(SslResult result) throws Exception {
+    protected boolean isAlert(SslResult result) {
         if (result.getSSLExpirationDate(0).isEmpty()) {
             throw new RuntimeException("SSL certificate not found");
         }
         LocalDateTime certificateExpiration = result.getSSLExpirationDate(0).get();
-        LocalDateTime alertDate = LocalDateTime.now().plusDays(daysInAdvance);
+        LocalDateTime alertDate = LocalDateTime.now().plusDays(metadata.getDaysInAdvance());
         return alertDate.isAfter(certificateExpiration);
-    }
-
-    private enum RequestMethod {
-        GET,  POST, PUT, DELETE, HEAD, PATCH, OPTIONS, TRACE;
     }
 
 }
