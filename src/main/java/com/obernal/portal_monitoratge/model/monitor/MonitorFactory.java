@@ -1,31 +1,29 @@
-package com.obernal.portal_monitoratge.app.service.impl;
+package com.obernal.portal_monitoratge.model.monitor;
 
-import com.obernal.portal_monitoratge.app.service.MonitorFactory;
-import com.obernal.portal_monitoratge.model.monitor.Monitor;
-import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbPoolSingleton;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMetadata;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMonitor;
+import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpMetadata;
+import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpMonitor;
 import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslMetadata;
 import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslMonitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class MonitorFactoryImpl implements MonitorFactory {
-    private static final Logger logger = LoggerFactory.getLogger(MonitorFactoryImpl.class);
+public class MonitorFactory {
 
     private final DbPoolSingleton dbPoolSingleton;
 
-    public MonitorFactoryImpl(DbPoolSingleton dbPoolSingleton) {
+    public MonitorFactory(DbPoolSingleton dbPoolSingleton) {
         this.dbPoolSingleton = dbPoolSingleton;
     }
 
-    @Override
     public Monitor<?, ?> create(MonitorMetadata metadata) {
+        if (metadata.getType() == null) {
+            throw new RuntimeException("Type does not exist: " + metadata.getType());
+        }
         return switch (metadata.getType()) {
             case SSL -> new SslMonitor((SslMetadata) metadata);
             case DB -> new DbMonitor((DbMetadata) metadata, dbPoolSingleton);
-            default -> throw new RuntimeException("Type does not exist: " + metadata.getType());
+            case HTTP -> new HttpMonitor((HttpMetadata) metadata);
         };
     }
 
