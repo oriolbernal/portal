@@ -10,7 +10,6 @@ import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 public class MonitorServiceImpl implements MonitorService {
@@ -46,16 +45,8 @@ public class MonitorServiceImpl implements MonitorService {
         logger.info("Scheduling monitor: {} and cron {}", metadata.getId(), metadata.getCron());
         if (metadata.isActive()) {
             Monitor<?, ?> monitor = factory.create(metadata);
-            scheduler.schedule(metadata.getId(), metadata.getCron(), runnable(monitor));
+            scheduler.schedule(metadata.getId(), metadata.getCron(), monitor::run);
         }
-    }
-
-    private Runnable runnable(Monitor<?, ?> monitor) {
-        return () -> {
-            logger.info("Executing monitor: {} at {}", monitor.getId(), LocalDateTime.now());
-            Execution<?> execution = monitor.run();
-            logger.info("Execution finished for monitor: {} in {} seconds", monitor.getId(), execution.getElapsedTimeInSeconds());
-        };
     }
 
     @Override

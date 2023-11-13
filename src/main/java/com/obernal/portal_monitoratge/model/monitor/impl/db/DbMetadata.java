@@ -14,7 +14,6 @@ public class DbMetadata extends MonitorMetadata {
     private final Long maxValue;
     private final String wordToSearch;
 
-
     public DbMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, String datasource, String query, Long minValue, Long maxValue, String wordToSearch) {
         super(name, description, cron, service, labels, documentation);
         this.datasource = datasource;

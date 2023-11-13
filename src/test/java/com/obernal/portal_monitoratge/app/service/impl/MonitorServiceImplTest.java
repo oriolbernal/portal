@@ -15,8 +15,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class MonitorServiceImplTest {
 
@@ -47,11 +46,20 @@ class MonitorServiceImplTest {
 
     @Test
     public void testScheduleActiveMonitors() {
-        List<MonitorMetadata> monitors = Arrays.asList(
+        List<MonitorMetadata> metadatas = Arrays.asList(
                 new DummyMonitorMetadata("id1", "cron1", true),
                 new DummyMonitorMetadata("id2", "cron2", false)
         );
-        when(persistence.findAll()).thenReturn(monitors.stream());
+        when(persistence.findAll()).thenReturn(metadatas.stream());
+        when(factory.create(any(DummyMonitorMetadata.class)))
+                .thenAnswer(invocation -> {
+                    DummyMonitorMetadata metadata = invocation.getArgument(0);
+                    if ("id1".equals(metadata.getId())) {
+                        return new DummyMonitor((DummyMonitorMetadata) metadatas.get(0));
+                    } else {
+                        return new DummyMonitor((DummyMonitorMetadata) metadatas.get(1));
+                    }
+                });
         long scheduledCount = service.scheduleActiveMonitors();
         assertEquals(1, scheduledCount);
     }
