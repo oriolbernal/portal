@@ -1,11 +1,12 @@
 package com.obernal.portal_monitoratge.app.service.impl;
 
-import com.obernal.portal_monitoratge.model.Execution;
+import com.obernal.portal_monitoratge.app.service.MonitorFactory;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 import com.obernal.portal_monitoratge.app.service.MonitorService;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
 import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
+import com.obernal.portal_monitoratge.model.monitor.MonitorType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,30 +24,32 @@ class MonitorServiceImplTest {
 
     private MonitorPersistence persistence;
     private SchedulerService scheduler;
+    private MonitorFactory factory;
 
     @BeforeEach
     void setUp() {
         persistence = mock(MonitorPersistence.class);
         scheduler = mock(SchedulerService.class);
-        service = new MonitorServiceImpl(persistence, scheduler);
+        factory = mock(MonitorFactory.class);
+        service = new MonitorServiceImpl(persistence, scheduler, factory);
     }
 
     @Test
     public void testFindAll() {
-        List<Monitor> monitors = Arrays.asList(
-                new DummyMonitor("id1", "cron1", true),
-                new DummyMonitor("id2", "cron2", false)
+        List<MonitorMetadata> monitors = Arrays.asList(
+                new DummyMonitorMetadata("id1", "cron1", true),
+                new DummyMonitorMetadata("id2", "cron2", false)
         );
         when(persistence.findAll()).thenReturn(monitors.stream());
-        Stream<Monitor> result = service.findAll();
+        Stream<MonitorMetadata> result = service.findAll();
         assertEquals(2, result.count());
     }
 
     @Test
     public void testScheduleActiveMonitors() {
-        List<Monitor> monitors = Arrays.asList(
-                new DummyMonitor("id1", "cron1", true),
-                new DummyMonitor("id2", "cron2", false)
+        List<MonitorMetadata> monitors = Arrays.asList(
+                new DummyMonitorMetadata("id1", "cron1", true),
+                new DummyMonitorMetadata("id2", "cron2", false)
         );
         when(persistence.findAll()).thenReturn(monitors.stream());
         long scheduledCount = service.scheduleActiveMonitors();
@@ -55,18 +58,18 @@ class MonitorServiceImplTest {
 
     @Test
     public void testCreate() {
-        Monitor newMonitor = new DummyMonitor("new_id", "new_cron", true);
-        when(persistence.create(any(Monitor.class))).thenReturn(newMonitor);
-        Monitor createdMonitor = service.create(newMonitor);
+        var newMonitor = new DummyMonitorMetadata("new_id", "new_cron", true);
+        when(persistence.create(any(MonitorMetadata.class))).thenReturn(newMonitor);
+        var createdMonitor = service.create(newMonitor);
         assertNotNull(createdMonitor);
         assertEquals("new_id", createdMonitor.getId());
     }
 
     @Test
     public void testFindByIdExistingMonitor() throws NotFoundException {
-        Monitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
+        var existingMonitor = new DummyMonitorMetadata("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
-        Monitor foundMonitor = service.findById("existing_id");
+        var foundMonitor = service.findById("existing_id");
         assertNotNull(foundMonitor);
         assertEquals("existing_id", foundMonitor.getId());
     }
@@ -79,10 +82,10 @@ class MonitorServiceImplTest {
 
     @Test
     public void testUpdate() throws NotFoundException {
-        var existingMonitor = new DummyMonitor("existing_id", "cron1", true);
+        var existingMonitor = new DummyMonitorMetadata("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
-        when(persistence.update(any(Monitor.class))).thenReturn(existingMonitor);
-        DummyMonitorMetadata metadata = new DummyMonitorMetadata("id", "new cron", false);
+        when(persistence.update(any(MonitorMetadata.class))).thenReturn(existingMonitor);
+        var metadata = new DummyMonitorMetadata("id", "new cron", false);
         var updatedMonitor = service.update("existing_id", metadata);
         assertNotNull(updatedMonitor);
         assertEquals("new cron", updatedMonitor.getCron());
@@ -90,9 +93,9 @@ class MonitorServiceImplTest {
 
     @Test
     public void testToggle_Enable() throws NotFoundException {
-        var existingMonitor = new DummyMonitor("existing_id", "cron1", false);
+        var existingMonitor = new DummyMonitorMetadata("existing_id", "cron1", false);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
-        when(persistence.update(any(Monitor.class))).thenReturn(existingMonitor);
+        when(persistence.update(any(MonitorMetadata.class))).thenReturn(existingMonitor);
         var toggledMonitor = service.toggle("existing_id");
         assertNotNull(toggledMonitor);
         assertTrue(toggledMonitor.isActive());
@@ -100,27 +103,37 @@ class MonitorServiceImplTest {
 
     @Test
     public void testToggle_Disable() throws NotFoundException {
-        DummyMonitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
+        var existingMonitor = new DummyMonitorMetadata("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
-        when(persistence.update(any(Monitor.class))).thenReturn(existingMonitor);
-        Monitor toggledMonitor = service.toggle("existing_id");
+        when(persistence.update(any(MonitorMetadata.class))).thenReturn(existingMonitor);
+        var toggledMonitor = service.toggle("existing_id");
         assertNotNull(toggledMonitor);
         assertFalse(toggledMonitor.isActive());
     }
 
     @Test
     public void testDelete() throws NotFoundException {
-        DummyMonitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
+        var existingMonitor = new DummyMonitorMetadata("existing_id", "cron1", true);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
-        Monitor deletedMonitor = service.delete("existing_id");
+        var deletedMonitor = service.delete("existing_id");
         assertNotNull(deletedMonitor);
     }
 
     @Test
     public void testRun() throws NotFoundException {
-        DummyMonitor existingMonitor = new DummyMonitor("existing_id", "cron1", true);
+        var existingMonitor = new DummyMonitorMetadata("existing_id", "cron1", true);
+        var monitor = new DummyMonitor(existingMonitor);
         when(persistence.findById("existing_id")).thenReturn(Optional.of(existingMonitor));
-        Execution result = service.run("existing_id");
+        when(factory.create(any(DummyMonitorMetadata.class)))
+                .thenAnswer(invocation -> {
+                    DummyMonitorMetadata metadata = invocation.getArgument(0);
+                    if ("existing_id".equals(metadata.getId())) {
+                        return monitor;
+                    } else {
+                        return null;
+                    }
+                });
+        var result = service.run("existing_id");
         assertNotNull(result);
     }
 
@@ -134,8 +147,8 @@ class MonitorServiceImplTest {
 
 class DummyMonitor extends Monitor<DummyMonitorMetadata, Object> {
 
-    public DummyMonitor(String id, String cron, boolean alert) {
-        super(new DummyMonitorMetadata(id, cron, alert));
+    public DummyMonitor(DummyMonitorMetadata metadata) {
+        super(metadata);
     }
 
     @Override
@@ -155,7 +168,7 @@ class DummyMonitorMetadata extends MonitorMetadata {
     private final double random;
 
     public DummyMonitorMetadata(String id, String cron, boolean active) {
-        super(id, null, null, null, "name", "description", cron, "service", new HashSet<>(), "documentation", active);
+        super(id, null, null, MonitorType.SSL, "name", "description", cron, "service", new HashSet<>(), "documentation", active);
         random = Math.random(); // greater than or equal to 0.0 and less than 1.0
     }
 

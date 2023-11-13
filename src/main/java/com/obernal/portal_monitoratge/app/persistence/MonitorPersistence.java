@@ -1,19 +1,19 @@
 package com.obernal.portal_monitoratge.app.persistence;
 
-import com.obernal.portal_monitoratge.model.monitor.Monitor;
+import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface MonitorPersistence {
 
-    Stream<Monitor> findAll();
+    Stream<MonitorMetadata> findAll();
 
-    Optional<Monitor> findById(String id);
+    Optional<MonitorMetadata> findById(String id);
 
-    Monitor create(Monitor monitor);
+    MonitorMetadata create(MonitorMetadata monitor);
 
-    Monitor update(Monitor monitor);
+    MonitorMetadata update(MonitorMetadata monitor);
 
     void deleteById(String id);
 
