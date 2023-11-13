@@ -16,7 +16,7 @@ public class DbMetadata extends MonitorMetadata {
 
 
     public DbMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, String datasource, String query, Long minValue, Long maxValue, String wordToSearch) {
-        super(MonitorType.DB, name, description, cron, service, labels, documentation);
+        super(name, description, cron, service, labels, documentation);
         this.datasource = datasource;
         this.query = query;
         this.minValue = minValue;
@@ -25,12 +25,17 @@ public class DbMetadata extends MonitorMetadata {
     }
 
     public DbMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active, String datasource, String query, Long minValue, Long maxValue, String wordToSearch) {
-        super(id, created, updated, MonitorType.DB, name, description, cron, service, labels, documentation, active);
+        super(id, created, updated, name, description, cron, service, labels, documentation, active);
         this.datasource = datasource;
         this.query = query;
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.wordToSearch = wordToSearch;
+    }
+
+    @Override
+    public MonitorType getType() {
+        return MonitorType.DB;
     }
 
     public String getDatasource() {
@@ -52,4 +57,5 @@ public class DbMetadata extends MonitorMetadata {
     public String getWordToSearch() {
         return wordToSearch;
     }
+
 }

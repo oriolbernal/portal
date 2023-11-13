@@ -50,7 +50,7 @@ class SslMonitorTest {
                         0
                 ));
         var execution = monitor.run();
-        assertEquals("SSL certificate not found", execution.getErrorMessage());
+        assertEquals("Connection is not ssl!", execution.getErrorMessage());
     }
 
     @Test

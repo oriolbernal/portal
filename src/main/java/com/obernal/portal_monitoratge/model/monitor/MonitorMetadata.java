@@ -12,7 +12,6 @@ public abstract class MonitorMetadata {
     private final String id;
     private final LocalDateTime created;
     private LocalDateTime updated;
-    private MonitorType type;
     private String name;
     private String description;
     private String cron;
@@ -21,11 +20,10 @@ public abstract class MonitorMetadata {
     private String documentation;
     private boolean active;
 
-    public MonitorMetadata(MonitorType type, String name, String description, String cron, String service, Set<String> labels, String documentation) {
+    public MonitorMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation) {
         this.id = UUID.randomUUID().toString();
         created = LocalDateTime.now();
         updated = null;
-        this.type = type;
         this.name = name;
         this.description = description;
         this.cron = cron;
@@ -35,11 +33,10 @@ public abstract class MonitorMetadata {
         this.active = true;
     }
 
-    public MonitorMetadata(String id, LocalDateTime created, LocalDateTime updated, MonitorType type, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active) {
+    public MonitorMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active) {
         this.id = id;
         this.created = created;
         this.updated = updated;
-        this.type = type;
         this.name = name;
         this.description = description;
         this.cron = cron;
@@ -49,12 +46,13 @@ public abstract class MonitorMetadata {
         this.active = active;
     }
 
+    public abstract MonitorType getType();
+
     public void toggle() {
         active = !active;
     }
 
     public void update(MonitorMetadata metadata) {
-        this.type = metadata.getType();
         this.name = metadata.getName();
         this.description = metadata.getDescription();
         this.cron = metadata.getCron();
@@ -79,10 +77,6 @@ public abstract class MonitorMetadata {
 
     public LocalDateTime getUpdated() {
         return updated;
-    }
-
-    public MonitorType getType() {
-        return type;
     }
 
     public String getName() {

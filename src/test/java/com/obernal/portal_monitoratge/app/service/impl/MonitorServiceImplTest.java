@@ -168,11 +168,16 @@ class DummyMonitorMetadata extends MonitorMetadata {
     private final double random;
 
     public DummyMonitorMetadata(String id, String cron, boolean active) {
-        super(id, null, null, MonitorType.SSL, "name", "description", cron, "service", new HashSet<>(), "documentation", active);
+        super(id, null, null, "name", "description", cron, "service", new HashSet<>(), "documentation", active);
         random = Math.random(); // greater than or equal to 0.0 and less than 1.0
     }
 
     public double getRandom() {
         return random;
+    }
+
+    @Override
+    public MonitorType getType() {
+        return null;
     }
 }

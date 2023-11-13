@@ -1,5 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
+import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpResult;
+
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import java.net.http.HttpResponse;
@@ -9,34 +11,26 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SslResult {
+public class SslResult extends HttpResult {
 
-    private final Map<String, List<String>> headers;
-    private final String body;
-    private final int statusCode;
-    private final String url;
-    private final String version;
     private final boolean isSSL;
     private final List<X509Certificate> certificates;
     private final String protocol;
     private final String cipherSuite;
+    private final List<LocalDateTime> sslExpiration;
+    private final List<String> cn;
 
     public SslResult(HttpResponse<String> response) {
-        headers = response.headers().map();
-        body = response.body();
-        statusCode = response.statusCode();
-        version = response.version().toString();
-        url = response.uri().toString();
-        isSSL = response.sslSession().isPresent();
-        if (isSSL) {
-            certificates = loadSslCertificates(response.sslSession().get());
-            protocol = response.sslSession().get().getProtocol();
-            cipherSuite = response.sslSession().get().getCipherSuite();
-        } else {
-            certificates = new ArrayList<>();
-            protocol = null;
-            cipherSuite = null;
+        super(response);
+        if (response.sslSession().isEmpty()) {
+            throw new RuntimeException("Connection is not ssl!");
         }
+        isSSL = response.sslSession().isPresent();
+        certificates = loadSslCertificates(response.sslSession().get());
+        protocol = response.sslSession().get().getProtocol();
+        cipherSuite = response.sslSession().get().getCipherSuite();
+        sslExpiration = loadSslCertificates(response.sslSession().get()).stream().map(this::getSSLExpirationDate).collect(Collectors.toList());
+        cn = loadSslCertificates(response.sslSession().get()).stream().map(this::getCN).collect(Collectors.toList());
     }
 
     private List<X509Certificate> loadSslCertificates(SSLSession session) {
@@ -49,14 +43,6 @@ public class SslResult {
         }
     }
 
-    public Optional<LocalDateTime> getSSLExpirationDate(int depth) {
-        if (!isSSL || certificates.size() <= depth) {
-            return Optional.empty();
-        }
-        X509Certificate certificate = certificates.get(depth);
-        return Optional.of(getSSLExpirationDate(certificate));
-    }
-
     private LocalDateTime getSSLExpirationDate(X509Certificate certificate) {
         return certificate.getNotAfter()
                 .toInstant()
@@ -64,9 +50,19 @@ public class SslResult {
                 .toLocalDateTime();
     }
 
+    private String getCN(X509Certificate certificate) {
+        return certificate.getSubjectX500Principal()
+                .getName()
+                .split("CN=")[1]
+                .split(",")[0];
+    }
+
+    public LocalDateTime getSSLExpirationDate(int depth) {
+        return sslExpiration.get(depth);
+    }
+
     public String getCN(int depth) {
-        String dn = certificates.get(depth).getSubjectX500Principal().getName();
-        return dn.split("CN=")[1].split(",")[0];
+        return cn.get(depth);
     }
 
 }
