@@ -31,8 +31,8 @@ public class DbMonitor extends Monitor<DbMetadata, DbResult> {
 
     @Override
     protected boolean isAlert(DbResult result) {
-        String firstKey = new ArrayList<>(result.getData().get(0).keySet()).get(0);
-        String firstValue = result.getData().get(0).get(firstKey);
+        String firstKey = new ArrayList<>(result.getTable().get(0).keySet()).get(0);
+        String firstValue = result.getTable().get(0).get(firstKey);
         return isAlert(firstValue);
     }
 

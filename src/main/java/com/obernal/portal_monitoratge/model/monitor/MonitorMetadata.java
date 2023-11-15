@@ -1,8 +1,5 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.support.CronTrigger;
-
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -61,10 +58,6 @@ public abstract class MonitorMetadata {
         this.documentation = metadata.getDocumentation();
         this.active = metadata.isActive();
         this.updated = LocalDateTime.now();
-    }
-
-    public Trigger getTrigger() {
-        return new CronTrigger(cron);
     }
 
     public String getId() {

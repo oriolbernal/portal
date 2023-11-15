@@ -1,41 +1,42 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
+import com.obernal.portal_monitoratge.model.monitor.Result;
+
 import java.net.http.HttpResponse;
 import java.util.*;
 
-public class HttpResult {
-
-    private final Map<String, List<String>> headers;
-    private final String body;
-    private final int statusCode;
-    private final String url;
-    private final String version;
+public class HttpResult extends Result {
 
     public HttpResult(HttpResponse<String> response) {
-        headers = response.headers().map();
-        body = response.body();
-        statusCode = response.statusCode();
-        version = response.version().toString();
-        url = response.uri().toString();
+        data.put("headers", response.headers().map());
+        data.put("body", response.body());
+        data.put("statusCode", response.statusCode());
+        data.put("version", response.version().toString());
+        data.put("url", response.uri().toString());
     }
 
     public Map<String, List<String>> getHeaders() {
-        return headers;
-    }
-
-    public String getVersion() {
-        return version;
+        return (Map<String, List<String>>) data.get("headers");
     }
 
     public String getBody() {
-        return body;
+        return data.get("body").toString();
     }
 
     public int getStatusCode() {
-        return statusCode;
+        return (int) data.get("statusCode");
+    }
+
+    public String getVersion() {
+        return data.get("version").toString();
     }
 
     public String getUrl() {
-        return url;
+        return data.get("url").toString();
+    }
+
+    @Override
+    public Object get(String key) {
+        return data.get(key);
     }
 }

@@ -26,6 +26,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -47,6 +48,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -68,6 +70,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -89,6 +92,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -110,6 +114,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"A"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -131,6 +136,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -152,6 +158,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -173,6 +180,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -194,6 +202,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -215,6 +224,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -236,6 +246,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         assertDoesNotThrow(monitor::run);
@@ -256,6 +267,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         var execution = monitor.run();
@@ -277,6 +289,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
+                        false,
                         0
                 ));
         assertDoesNotThrow(monitor::run);

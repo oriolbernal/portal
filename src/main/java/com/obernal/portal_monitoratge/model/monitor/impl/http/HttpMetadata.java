@@ -2,15 +2,16 @@ package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
 import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 import com.obernal.portal_monitoratge.model.monitor.MonitorType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLParameters;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.*;
+import java.io.FileInputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 public class HttpMetadata extends MonitorMetadata {
+    private static final Logger logger = LoggerFactory.getLogger(HttpMetadata.class);
     private final String endpoint;
     private final RequestMethod method;
     private final HttpRequest.BodyPublisher publisher;
@@ -25,10 +27,11 @@ public class HttpMetadata extends MonitorMetadata {
     private final HttpClient.Version version;
     private final HttpClient.Redirect redirect;
     private final SSLParameters sslParameters;
+    private final boolean sslAuth;
     private final Integer statusCode;
     private final String expectedBody;
 
-    public HttpMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, String endpoint, RequestMethod method, String body, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, Integer statusCode, String expectedBody) {
+    public HttpMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, String endpoint, RequestMethod method, String body, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, boolean sslAuth, Integer statusCode, String expectedBody) {
         super(name, description, cron, service, labels, documentation);
         this.endpoint = endpoint;
         this.method = method;
@@ -38,11 +41,12 @@ public class HttpMetadata extends MonitorMetadata {
         this.redirect = redirect;
         sslParameters = new SSLParameters();
         sslParameters.setProtocols(sslProtocols);
+        this.sslAuth = sslAuth;
         this.statusCode = statusCode;
         this.expectedBody = expectedBody;
     }
 
-    public HttpMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active, String endpoint, RequestMethod method, String body, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, Integer statusCode, String expectedBody) {
+    public HttpMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active, String endpoint, RequestMethod method, String body, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, boolean sslAuth, Integer statusCode, String expectedBody) {
         super(id, created, updated, name, description, cron, service, labels, documentation, active);
         this.endpoint = endpoint;
         this.method = method;
@@ -52,6 +56,7 @@ public class HttpMetadata extends MonitorMetadata {
         this.redirect = redirect;
         sslParameters = new SSLParameters();
         sslParameters.setProtocols(sslProtocols);
+        this.sslAuth = sslAuth;
         this.statusCode = statusCode;
         this.expectedBody = expectedBody;
     }
@@ -61,7 +66,11 @@ public class HttpMetadata extends MonitorMetadata {
         return MonitorType.HTTP;
     }
 
-    public HttpClient getClient(KeyManager[] keyManagers, TrustManager[] trustManagers) throws NoSuchAlgorithmException, KeyManagementException {
+    public HttpClient getClient(TrustManager[] trustManagers) throws NoSuchAlgorithmException, KeyManagementException {
+        KeyManager[] keyManagers = null;
+        if(sslAuth) {
+            keyManagers = getClientAuth("src/main/resources/CDA-1_SGNM_00.p12", "1234");
+        }
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(
                 keyManagers,
@@ -75,6 +84,23 @@ public class HttpMetadata extends MonitorMetadata {
                 .sslContext(sslContext)
                 .sslParameters(sslParameters)
                 .build();
+    }
+
+    public HttpClient getClient() throws NoSuchAlgorithmException, KeyManagementException {
+        return getClient(null);
+    }
+
+    private static KeyManager[] getClientAuth(String p12Path, String password) {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("PKCS12");
+            keyStore.load(new FileInputStream(p12Path), password.toCharArray());
+            KeyManagerFactory keyMgrFactory = KeyManagerFactory.getInstance("SunX509");
+            keyMgrFactory.init(keyStore, password.toCharArray());
+            return keyMgrFactory.getKeyManagers();
+        } catch (Exception e) {
+            logger.warn("Unable to load client certificate, no certificate will be configured", e);
+        }
+        return null;
     }
 
     public HttpRequest getRequest() {

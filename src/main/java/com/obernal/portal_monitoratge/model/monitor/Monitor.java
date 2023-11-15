@@ -4,7 +4,7 @@ import com.obernal.portal_monitoratge.model.Execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class Monitor<M extends MonitorMetadata, R> implements Task<R> {
+public abstract class Monitor<M extends MonitorMetadata, R extends Result> implements Task<R> {
     private static final Logger logger = LoggerFactory.getLogger(Monitor.class);
 
     protected M metadata;
@@ -34,21 +34,5 @@ public abstract class Monitor<M extends MonitorMetadata, R> implements Task<R> {
 
     protected abstract R perform() throws Exception;
     protected abstract boolean isAlert(R result) throws Exception;
-
-    public String getCron() {
-        return metadata.getCron();
-    }
-
-    public void update(M metadata) {
-        this.metadata.update(metadata);
-    }
-
-    public void toggle() {
-        metadata.toggle();
-    }
-
-    public boolean isActive() {
-        return metadata.isActive();
-    }
 
 }
