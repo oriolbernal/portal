@@ -1,7 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.db;
 
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
-import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbConnectionPool;
+import com.obernal.portal_monitoratge.clients.DbConnectionPool;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

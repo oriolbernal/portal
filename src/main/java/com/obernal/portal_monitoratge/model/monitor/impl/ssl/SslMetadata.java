@@ -10,13 +10,13 @@ import java.util.Set;
 public class SslMetadata extends HttpMetadata {
     private final int daysInAdvance;
 
-    public SslMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, String endpoint, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, boolean sslAuth, int daysInAdvance) {
-        super(name, description, cron, service, labels, documentation, endpoint, HttpMetadata.RequestMethod.GET, null, timeOutInSeconds, version, redirect, sslProtocols, sslAuth, null, null);
+    public SslMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, String endpoint, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, boolean clientCertificate, int daysInAdvance) {
+        super(name, description, cron, service, labels, documentation, endpoint, HttpMetadata.RequestMethod.GET, null, timeOutInSeconds, version, redirect, sslProtocols, clientCertificate, null, null);
         this.daysInAdvance = daysInAdvance;
     }
 
-    public SslMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active, String endpoint, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, boolean sslAuth, int daysInAdvance) {
-        super(id, created, updated, name, description, cron, service, labels, documentation, active, endpoint, HttpMetadata.RequestMethod.GET, null, timeOutInSeconds, version, redirect, sslProtocols, sslAuth, null, null);
+    public SslMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active, String endpoint, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, boolean clientCertificate, int daysInAdvance) {
+        super(id, created, updated, name, description, cron, service, labels, documentation, active, endpoint, HttpMetadata.RequestMethod.GET, null, timeOutInSeconds, version, redirect, sslProtocols, clientCertificate, null, null);
         this.daysInAdvance = daysInAdvance;
     }
 

@@ -1,29 +1,45 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLHandshakeException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.http.HttpClient;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.security.KeyStore;
+import java.util.Properties;
 
 public class HttpMonitor extends Monitor<HttpMetadata, HttpResult> {
-
-    public HttpMonitor(HttpMetadata metadata) {
+    private static final Logger logger = LoggerFactory.getLogger(HttpMonitor.class);
+    private final Properties properties;
+    public HttpMonitor(HttpMetadata metadata, Properties properties) {
         super(metadata);
+        this.properties = properties;
     }
 
     @Override
     protected HttpResult perform() throws Exception {
-        HttpClient client = metadata.getClient();
-        HttpRequest request = metadata.getRequest();
         try {
+            KeyManager[] keyManagers = null;
+            if(metadata.isClientCertificate()) {
+                keyManagers = getClientCertificate(properties.getProperty("http.certificateClient.p12"), properties.getProperty("http.certificateClient.password"));
+            }
+            HttpClient client = metadata.getClient(keyManagers, null);
+            HttpRequest request = metadata.getRequest();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return new HttpResult(response);
         } catch (HttpConnectTimeoutException e) {
             throw new RuntimeException("Connection Timeout: " + e.getMessage());
+        } catch (SSLHandshakeException e) {
+            throw new RuntimeException("SSL Connection problem: " + e.getMessage());
         } catch (ConnectException e) {
             throw new RuntimeException("ConnectException (Unresolved host?): " + e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -31,6 +47,19 @@ public class HttpMonitor extends Monitor<HttpMetadata, HttpResult> {
         } catch (IOException e) {
             throw new RuntimeException("I/O error occurred when sending or receiving: " + e.getMessage());
         }
+    }
+
+    protected KeyManager[] getClientCertificate(String p12Path, String password) {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("PKCS12");
+            keyStore.load(new FileInputStream(p12Path), password.toCharArray());
+            KeyManagerFactory keyMgrFactory = KeyManagerFactory.getInstance("SunX509");
+            keyMgrFactory.init(keyStore, password.toCharArray());
+            return keyMgrFactory.getKeyManagers();
+        } catch (Exception e) {
+            logger.warn("Unable to load client certificate, no certificate will be configured", e);
+        }
+        return null;
     }
 
     @Override

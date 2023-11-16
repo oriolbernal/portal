@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
-import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbConnectionPool;
+import com.obernal.portal_monitoratge.clients.DbConnectionPool;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMetadata;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMonitor;
 import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpMetadata;
@@ -9,6 +9,8 @@ import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslMetadata;
 import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -20,10 +22,10 @@ class MonitorFactoryTest {
 
     @BeforeEach
     void setUp() {
+        Properties properties = mock(Properties.class);
         DbConnectionPool connectionPool = mock(DbConnectionPool.class);
-        factory = new MonitorFactory(connectionPool);
+        factory = new MonitorFactory(properties, connectionPool);
     }
-
 
     @Test
     public void testCreate_shouldReturnCorrectMonitor() {
@@ -45,4 +47,5 @@ class MonitorFactoryTest {
         when(metadata.getType()).thenReturn(null);
         assertThrows(RuntimeException.class, () -> factory.create(metadata));
     }
+
 }

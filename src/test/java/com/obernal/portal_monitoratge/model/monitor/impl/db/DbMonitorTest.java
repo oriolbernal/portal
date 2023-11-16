@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.db;
 
-import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbConnectionPool;
+import com.obernal.portal_monitoratge.clients.DbConnectionPool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
