@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DbPoolSingleton {
-    private static final Logger logger = LoggerFactory.getLogger(DbPoolSingleton.class);
+public class DbConnectionPool {
+    private static final Logger logger = LoggerFactory.getLogger(DbConnectionPool.class);
 
     private final Properties properties;
     private final Map<String, Connection> connexions;
     private final Map<String, LocalDateTime> lastUsed;
-    public DbPoolSingleton(Properties properties) {
+    public DbConnectionPool(Properties properties) {
         logger.info("Initializing DBPool instance...");
         this.connexions = new ConcurrentHashMap<>();
         this.lastUsed = new ConcurrentHashMap<>();

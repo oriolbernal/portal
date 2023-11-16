@@ -35,8 +35,4 @@ public class HttpResult extends Result {
         return data.get("url").toString();
     }
 
-    @Override
-    public Object get(String key) {
-        return data.get(key);
-    }
 }

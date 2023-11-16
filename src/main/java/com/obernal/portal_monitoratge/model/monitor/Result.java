@@ -9,6 +9,4 @@ public abstract class Result {
         this.data = new HashMap<>();
     }
 
-    public abstract Object get(String key);
-
 }

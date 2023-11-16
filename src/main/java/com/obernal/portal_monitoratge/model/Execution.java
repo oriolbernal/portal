@@ -32,7 +32,7 @@ public class Execution<R> implements Report<R> {
 
     @Override
     public R getData() {
-        return null;
+        return data;
     }
 
     public String getId() {

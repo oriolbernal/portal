@@ -13,6 +13,8 @@ import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 
 public class SslMonitor extends Monitor<SslMetadata, SslResult> {
@@ -53,7 +55,7 @@ public class SslMonitor extends Monitor<SslMetadata, SslResult> {
                 }
             }
             return trustManagers;
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException | KeyStoreException e) {
             logger.error("Unable to load trustore manager", e);
             return null;
         }

@@ -1,7 +1,5 @@
-package com.obernal.portal_monitoratge.model.monitor.impl;
+package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
-import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslMetadata;
-import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslMonitor;
 import org.junit.jupiter.api.Test;
 
 import java.net.http.HttpClient;
@@ -13,7 +11,7 @@ class SslMonitorTest {
 
     @Test
     void sslCertificate_inLessThan_1ms() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -36,7 +34,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_http() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata("name",
                         "desc",
                         "cron",
@@ -57,7 +55,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_timeout() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -79,7 +77,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_tlsProtocol_notConfigured() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -101,7 +99,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_tlsProtocol_nonExistent() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -123,7 +121,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_certificate_handshake() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -145,7 +143,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_http2() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -167,7 +165,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_host_doesNotMatch_certificate() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -189,7 +187,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_host_unresolved() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -211,7 +209,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_certificate_untrusted_NotInCacerts() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -233,7 +231,7 @@ class SslMonitorTest {
 
     @Test
     void connect_with_clientAuth() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -254,7 +252,7 @@ class SslMonitorTest {
 
     @Test
     void error_if_certificate_revoked() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",
@@ -276,7 +274,7 @@ class SslMonitorTest {
 
     @Test
     void sslCertificate_expired_shouldNot_returnError() {
-        SslMonitor monitor = new SslMonitor(
+        var monitor = new SslMonitor(
                 new SslMetadata(
                         "name",
                         "desc",

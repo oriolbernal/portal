@@ -72,11 +72,7 @@ public class HttpMetadata extends MonitorMetadata {
             keyManagers = getClientAuth("src/main/resources/CDA-1_SGNM_00.p12", "1234");
         }
         SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(
-                keyManagers,
-                trustManagers,
-                new SecureRandom()
-        );
+        sslContext.init(keyManagers, trustManagers, new SecureRandom());
         return HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(timeOutInSeconds))
                 .version(version)

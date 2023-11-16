@@ -199,9 +199,5 @@ class DummyMetadata extends MonitorMetadata {
 }
 
 class DummyResult extends Result {
-
-    @Override
-    public Object get(String key) {
-        return null;
-    }
+    
 }

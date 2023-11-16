@@ -22,11 +22,35 @@ public class IgnoreCertificateExpirationTrustManagerTest {
     }
 
     @Test
+    public void checkServerTrusted_WithValidCertificate_ShouldNotThrowException() {
+        X509Certificate[] chain = new X509Certificate[1];
+        X509Certificate validCertificate = createValidCertificate();
+        chain[0] = validCertificate;
+        assertDoesNotThrow(() -> trustManager.checkServerTrusted(chain, "RSA"));
+    }
+
+    @Test
+    public void checkClientTrusted_WithValidCertificate_ShouldNotThrowException() {
+        X509Certificate[] chain = new X509Certificate[1];
+        X509Certificate validCertificate = createValidCertificate();
+        chain[0] = validCertificate;
+        assertDoesNotThrow(() -> trustManager.checkClientTrusted(chain, "RSA"));
+    }
+
+    @Test
     public void checkServerTrusted_WithExpiredCertificate_ShouldNotThrowException() {
         X509Certificate[] chain = new X509Certificate[1];
         X509Certificate expiredCertificate = createExpiredCertificate();
         chain[0] = expiredCertificate;
         assertDoesNotThrow(() -> trustManager.checkServerTrusted(chain, "RSA"));
+    }
+
+    @Test
+    public void checkClientTrusted_WithExpiredCertificate_ShouldNotThrowException() {
+        X509Certificate[] chain = new X509Certificate[1];
+        X509Certificate expiredCertificate = createExpiredCertificate();
+        chain[0] = expiredCertificate;
+        assertDoesNotThrow(() -> trustManager.checkClientTrusted(chain, "RSA"));
     }
 
     private X509Certificate createExpiredCertificate() {
@@ -35,5 +59,9 @@ public class IgnoreCertificateExpirationTrustManagerTest {
         return certificate;
     }
 
+    private X509Certificate createValidCertificate() {
+        X509Certificate certificate = mock(X509Certificate.class);
+        when(certificate.getNotAfter()).thenReturn(new Date(System.currentTimeMillis() + 1000));
+        return certificate;
+    }
 }
-

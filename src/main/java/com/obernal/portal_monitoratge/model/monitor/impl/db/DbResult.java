@@ -43,8 +43,4 @@ public class DbResult extends Result {
         return (int) data.get("rows");
     }
 
-    @Override
-    public Object get(String key) {
-        return null;
-    }
 }

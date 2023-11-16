@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
-import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbPoolSingleton;
+import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbConnectionPool;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMetadata;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMonitor;
 import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpMetadata;
@@ -20,8 +20,8 @@ class MonitorFactoryTest {
 
     @BeforeEach
     void setUp() {
-        DbPoolSingleton dbPoolSingleton = mock(DbPoolSingleton.class);
-        factory = new MonitorFactory(dbPoolSingleton);
+        DbConnectionPool connectionPool = mock(DbConnectionPool.class);
+        factory = new MonitorFactory(connectionPool);
     }
 
 

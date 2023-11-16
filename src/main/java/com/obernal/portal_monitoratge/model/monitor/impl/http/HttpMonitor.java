@@ -1,9 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
-import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslResult;
 
-import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.http.HttpClient;
@@ -23,11 +21,9 @@ public class HttpMonitor extends Monitor<HttpMetadata, HttpResult> {
         HttpRequest request = metadata.getRequest();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return new SslResult(response);
+            return new HttpResult(response);
         } catch (HttpConnectTimeoutException e) {
             throw new RuntimeException("Connection Timeout: " + e.getMessage());
-        } catch (SSLHandshakeException e) {
-            throw new RuntimeException("SSL Connection problem: " + e.getMessage());
         } catch (ConnectException e) {
             throw new RuntimeException("ConnectException (Unresolved host?): " + e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -42,9 +38,7 @@ public class HttpMonitor extends Monitor<HttpMetadata, HttpResult> {
         if(metadata.getStatusCode() != null && result.getStatusCode() != metadata.getStatusCode()) {
             return true;
         }
-        else {
-            return metadata.getExpectedBody() != null && !result.getBody().equals(metadata.getExpectedBody());
-        }
+        return metadata.getExpectedBody() != null && !result.getBody().contains(metadata.getExpectedBody());
     }
 
 }

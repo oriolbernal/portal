@@ -1,7 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.db;
 
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
-import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbPoolSingleton;
+import com.obernal.portal_monitoratge.model.monitor.impl.clients.DbConnectionPool;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,16 +11,16 @@ import java.util.ArrayList;
 
 public class DbMonitor extends Monitor<DbMetadata, DbResult> {
 
-    private final DbPoolSingleton dbPoolSingleton;
+    private final DbConnectionPool connectionPool;
 
-    public DbMonitor(DbMetadata metadata, DbPoolSingleton dbPoolSingleton) {
+    public DbMonitor(DbMetadata metadata, DbConnectionPool connectionPool) {
         super(metadata);
-        this.dbPoolSingleton = dbPoolSingleton;
+        this.connectionPool = connectionPool;
     }
 
     @Override
     protected DbResult perform() throws SQLException, ClassNotFoundException {
-        Connection connection = dbPoolSingleton.getConnection(metadata.getDatasource());
+        Connection connection = connectionPool.getConnection(metadata.getDatasource());
         try (Statement statement = connection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
                 ResultSet.CONCUR_READ_ONLY);
@@ -37,8 +37,8 @@ public class DbMonitor extends Monitor<DbMetadata, DbResult> {
     }
 
     private boolean isAlert(String result) throws RuntimeException {
-        if (metadata.getMinValue() != null || metadata.getMaxValue() != null) {
-            return isBetweenMinAndMax(result);
+        if (isNumber(result) && (metadata.getMinValue() != null || metadata.getMaxValue() != null)) {
+            return isBetweenMinAndMax(Long.parseLong(result));
         } else if (metadata.getWordToSearch() != null) {
             return searchWord(result);
         } else {
@@ -46,15 +46,10 @@ public class DbMonitor extends Monitor<DbMetadata, DbResult> {
         }
     }
 
-    private boolean isBetweenMinAndMax(String result) {
-        if (isNumber(result)) {
-            long number = Long.parseLong(result);
-            if (metadata.getMaxValue() == null) return number < metadata.getMinValue();
-            else if (metadata.getMinValue() == null) return number > metadata.getMaxValue();
-            else return number > metadata.getMaxValue() || number < metadata.getMinValue();
-        } else {
-            throw new RuntimeException("Query result is not a number: " + result);
-        }
+    private boolean isBetweenMinAndMax(long number) {
+        if (metadata.getMaxValue() == null) return number < metadata.getMinValue();
+        else if (metadata.getMinValue() == null) return number > metadata.getMaxValue();
+        else return number > metadata.getMaxValue() || number < metadata.getMinValue();
     }
 
     private boolean isNumber(String strNumber) {
