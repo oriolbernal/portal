@@ -15,6 +15,7 @@ public class HttpResult extends Result {
         data.put("url", response.uri().toString());
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, List<String>> getHeaders() {
         return (Map<String, List<String>>) data.get("headers");
     }

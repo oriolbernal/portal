@@ -15,14 +15,7 @@ public class PortalMonitoratgeApplication implements CommandLineRunner {
 	}
 
 	@Override
-	public void run(String... args) throws Exception {
+	public void run(String... args) {
 		logger.info("Running app!");
-		String aa = """
-				Execution execution = monitor.run();
-					Result r = monitor.do()
-					boolean alert = assert.compute(r);
-
-					if(alert)
-		""";
 	}
 }

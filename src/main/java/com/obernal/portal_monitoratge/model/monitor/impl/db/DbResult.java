@@ -31,6 +31,7 @@ public class DbResult extends Result {
         data.put("table", table);
     }
 
+    @SuppressWarnings("unchecked")
     public List<Map<String, String>> getTable() {
         return (List<Map<String, String>>) data.get("table");
     }

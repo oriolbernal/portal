@@ -126,7 +126,7 @@ public class HttpMetadata extends MonitorMetadata {
     }
 
     public enum RequestMethod {
-        GET, POST, PUT, DELETE, HEAD, PATCH, OPTIONS, TRACE;
+        GET, POST, PUT, DELETE, HEAD, PATCH, OPTIONS, TRACE
     }
 
 }

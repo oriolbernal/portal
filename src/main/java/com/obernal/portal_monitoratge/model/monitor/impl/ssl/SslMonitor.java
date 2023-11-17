@@ -62,7 +62,7 @@ public class SslMonitor extends HttpMonitor {
             }
             return trustManagers;
         } catch (NoSuchAlgorithmException | KeyStoreException e) {
-            logger.error("Unable to load trustore manager", e);
+            logger.error("Unable to load truststore manager", e);
             return null;
         }
     }

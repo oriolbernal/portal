@@ -80,7 +80,7 @@ class HttpMonitorTest {
     }
 
     @Test
-    void error_if_tlsProtocol_unsuported() {
+    void error_if_tlsProtocol_unsupported() {
         var monitor = createMonitor(
                 "https://tls-v1-2.badssl.com:1012/",
                 new String[]{"TLSv1.3"},

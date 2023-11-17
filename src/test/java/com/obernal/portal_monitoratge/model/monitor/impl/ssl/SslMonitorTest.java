@@ -23,8 +23,7 @@ class SslMonitorTest {
     void error_if_http() {
         var monitor = createMonitor(
                 "http://github.com/",
-                new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
-                false
+                new String[]{"TLSv1.2", "TLSv1.3"}
         );
         var execution = monitor.run();
         assertEquals("Connection is not ssl!", execution.getErrorMessage());
@@ -34,8 +33,7 @@ class SslMonitorTest {
     void sslCertificate_expired_shouldNot_returnError() {
         var monitor = createMonitor(
                 "https://expired.badssl.com/",
-                new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"},
-                false
+                new String[]{"TLSv1.2", "TLSv1.3"}
         );
         assertDoesNotThrow(monitor::run);
     }
@@ -51,7 +49,7 @@ class SslMonitorTest {
         return properties;
     }
 
-    private SslMonitor createMonitor(String endpoint, String[] sslProtocols, boolean clientCertificate) {
+    private SslMonitor createMonitor(String endpoint, String[] sslProtocols) {
         return new SslMonitor(
                 new SslMetadata(
                         "name",
@@ -65,7 +63,7 @@ class SslMonitorTest {
                         HttpClient.Version.HTTP_2,
                         HttpClient.Redirect.NEVER,
                         sslProtocols,
-                        clientCertificate,
+                        false,
                         0
                 ),
                 testProperties);

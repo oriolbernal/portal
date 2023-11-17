@@ -6,7 +6,6 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -75,7 +74,7 @@ class SchedulerServiceTest {
         when(scheduledFuture.getDelay(any(TimeUnit.class))).thenReturn(1000L);
         schedulerService.schedule("test_id", "0 0 * * * ?", () -> {});
         LocalDateTime nextExecutionTime = schedulerService.getNextExecutionTime("test_id").get();
-        LocalDateTime expectedTime = LocalDateTime.now().plus(1, ChronoUnit.SECONDS);
+        LocalDateTime expectedTime = LocalDateTime.now().plusSeconds(1);
         assertEquals(expectedTime.toLocalDate(), nextExecutionTime.toLocalDate());
     }
 

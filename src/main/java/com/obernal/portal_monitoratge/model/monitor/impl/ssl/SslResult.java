@@ -64,6 +64,7 @@ public class SslResult extends HttpResult {
                 .split(",")[0];
     }
 
+    @SuppressWarnings("unchecked")
     public LocalDateTime getSSLExpirationDate(int depth) {
         List<LocalDateTime> sslExpirations = (List<LocalDateTime>) data.get("sslExpiration");
         if(depth < sslExpirations.size()) {
@@ -72,6 +73,7 @@ public class SslResult extends HttpResult {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public String getCN(int depth) {
         List<String> cns = (List<String>) data.get("cn");
         if(depth < cns.size()) {

@@ -8,6 +8,7 @@ class PortalMonitoratgeApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// On purpose
 	}
 
 }

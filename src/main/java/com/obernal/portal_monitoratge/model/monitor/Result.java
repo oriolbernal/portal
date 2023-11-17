@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Result {
-    protected Map<String, Object> data;
+    protected final Map<String, Object> data;
     public Result() {
         this.data = new HashMap<>();
     }

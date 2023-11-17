@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 public abstract class Monitor<M extends MonitorMetadata, R extends Result> implements Task<R> {
     private static final Logger logger = LoggerFactory.getLogger(Monitor.class);
 
-    protected M metadata;
+    protected final M metadata;
 
     protected Monitor(M metadata) {
         this.metadata = metadata;
