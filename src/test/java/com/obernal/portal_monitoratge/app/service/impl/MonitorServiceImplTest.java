@@ -19,19 +19,18 @@ class MonitorServiceImplTest {
     private MonitorService service;
 
     private MonitorPersistence persistence;
-    private SchedulerService scheduler;
     private MonitorFactory factory;
 
     @BeforeEach
     void setUp() {
         persistence = mock(MonitorPersistence.class);
-        scheduler = mock(SchedulerService.class);
+        SchedulerService scheduler = mock(SchedulerService.class);
         factory = mock(MonitorFactory.class);
         service = new MonitorServiceImpl(persistence, scheduler, factory);
     }
 
     @Test
-    public void testFindAll() {
+    public void findAll() {
         List<MonitorMetadata> monitors = Arrays.asList(
                 new DummyMetadata("md1", "cron1"),
                 new DummyMetadata("md2", "cron2")
@@ -42,7 +41,7 @@ class MonitorServiceImplTest {
     }
 
     @Test
-    public void testScheduleActiveMonitors() {
+    public void scheduleActiveMonitors() {
         List<MonitorMetadata> metadatas = Arrays.asList(
                 new DummyMetadata("md1", "cron1"),
                 new DummyMetadata("md2", "cron2", false)
@@ -62,67 +61,64 @@ class MonitorServiceImplTest {
     }
 
     @Test
-    public void testCreate() {
+    public void create() {
         var metadata = new DummyMetadata("m1", "new_cron");
         when(persistence.create(any(MonitorMetadata.class))).thenReturn(metadata);
         var created = service.create(metadata);
-        assertNotNull(created);
         assertNotNull(created.getId());
-        assertEquals("m1", created.getName());
         assertNotNull(created.getCreated());
         assertNull(created.getUpdated());
+        assertEquals("m1", created.getName());
     }
 
     @Test
-    public void testFindByIdExistingMonitor() throws NotFoundException {
-        var existingMonitor = new DummyMetadata("existing1", "cron1");
-        when(persistence.findById("existing1")).thenReturn(Optional.of(existingMonitor));
-        var foundMonitor = service.findById("existing1");
+    public void findByIdExistingMonitor() throws NotFoundException {
+        var existingMonitor = new DummyMetadata("existing", "cron1");
+        when(persistence.findById("existing")).thenReturn(Optional.of(existingMonitor));
+        var foundMonitor = service.findById("existing");
         assertNotNull(foundMonitor);
-        assertEquals("existing1", foundMonitor.getName());
+        assertEquals("existing", foundMonitor.getName());
     }
 
     @Test
-    public void testFindByIdNonExistingMonitor() throws NotFoundException {
+    public void error_if_findById_notFound() throws NotFoundException {
         when(persistence.findById("non_existing_id")).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> service.findById("non_existing_id"));
     }
 
     @Test
-    public void testUpdate() throws NotFoundException {
-        var existing = new DummyMetadata("existing_id", "cron1");
+    public void update() throws NotFoundException {
+        var existing = new DummyMetadata("name", "cron1");
         when(persistence.findById(existing.getId())).thenReturn(Optional.of(existing));
         when(persistence.update(any(MonitorMetadata.class))).thenReturn(existing);
-        var metadata = new DummyMetadata("id", "new cron", false);
+        var metadata = new DummyMetadata("name", "new cron", false);
         var updated = service.update(existing.getId(), metadata);
-        assertNotNull(updated);
-        assertEquals("new cron", updated.getCron());
         assertNotNull(updated.getUpdated());
         assertNotEquals(metadata.getUpdated(), updated.getUpdated());
+        assertEquals(existing.getId(), updated.getId());
+        assertEquals("new cron", updated.getCron());
     }
 
     @Test
-    public void testToggle_Enable() throws NotFoundException {
+    public void toggle_enable() throws NotFoundException {
         var existing = new DummyMetadata("existing", "cron1", false);
         when(persistence.findById("existing")).thenReturn(Optional.of(existing));
         when(persistence.update(any(MonitorMetadata.class))).thenReturn(existing);
-        var toggledMonitor = service.toggle("existing");
-        assertNotNull(toggledMonitor);
-        assertTrue(toggledMonitor.isActive());
+        var toggled = service.toggle("existing");
+        assertTrue(toggled.isActive());
     }
 
     @Test
-    public void testToggle_Disable() throws NotFoundException {
-        var existing = new DummyMetadata("existing", "cron1");
+    public void toggle_disable() throws NotFoundException {
+        var existing = new DummyMetadata("existing", "cron1", true);
         when(persistence.findById("existing")).thenReturn(Optional.of(existing));
         when(persistence.update(any(MonitorMetadata.class))).thenReturn(existing);
-        var toggledMonitor = service.toggle("existing");
-        assertNotNull(toggledMonitor);
-        assertFalse(toggledMonitor.isActive());
+        var toggled = service.toggle("existing");
+        assertFalse(toggled.isActive());
     }
 
     @Test
-    public void testDelete() throws NotFoundException {
+    public void delete() throws NotFoundException {
         var existing = new DummyMetadata("existing", "cron1");
         when(persistence.findById("existing")).thenReturn(Optional.of(existing));
         var deletedMonitor = service.delete("existing");
@@ -130,7 +126,7 @@ class MonitorServiceImplTest {
     }
 
     @Test
-    public void testRun() throws NotFoundException {
+    public void run() throws NotFoundException {
         var existing = new DummyMetadata("existing", "cron1");
         var monitor = new DummyMonitor(existing);
         when(persistence.findById("existing")).thenReturn(Optional.of(existing));
@@ -148,7 +144,7 @@ class MonitorServiceImplTest {
     }
 
     @Test()
-    public void testRun_NotFound() throws NotFoundException {
+    public void error_if_run_notFound() throws NotFoundException {
         when(persistence.findById("non_existing_id")).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> service.run("non_existing_id"));
     }
@@ -199,5 +195,5 @@ class DummyMetadata extends MonitorMetadata {
 }
 
 class DummyResult extends Result {
-    
+
 }
