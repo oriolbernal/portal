@@ -1,5 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
+import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,17 +52,17 @@ class SslMonitorTest {
 
     private SslMonitor createMonitor(String endpoint, String[] sslProtocols) {
         return new SslMonitor(
-                new SslMetadata(
+                new SslContext(
+                        new MonitorMetadata(
                         "name",
                         "desc",
                         "cron",
                         "service",
                         new HashSet<>(),
-                        "docs",
+                        "docs"),
                         endpoint,
                         1,
                         HttpClient.Version.HTTP_2,
-                        HttpClient.Redirect.NEVER,
                         sslProtocols,
                         false,
                         0

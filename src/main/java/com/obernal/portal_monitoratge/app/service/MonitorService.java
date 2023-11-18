@@ -2,25 +2,25 @@ package com.obernal.portal_monitoratge.app.service;
 
 import com.obernal.portal_monitoratge.model.Execution;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
-import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
+import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 
 import java.util.stream.Stream;
 
 public interface MonitorService {
 
-    Stream<MonitorMetadata> findAll();
+    Stream<MonitorContext> findAll();
 
     long scheduleActiveMonitors();
 
-    MonitorMetadata create(MonitorMetadata metadata);
+    MonitorContext create(MonitorContext metadata);
 
-    MonitorMetadata findById(String id) throws NotFoundException;
+    MonitorContext findById(String id) throws NotFoundException;
 
-    MonitorMetadata update(String id, MonitorMetadata metadata) throws NotFoundException;
+    MonitorContext update(String id, MonitorContext metadata) throws NotFoundException;
 
-    MonitorMetadata toggle(String id) throws NotFoundException;
+    MonitorContext toggle(String id) throws NotFoundException;
 
-    MonitorMetadata delete(String id) throws NotFoundException;
+    MonitorContext delete(String id) throws NotFoundException;
 
     Execution<?> run(String id) throws NotFoundException;
 

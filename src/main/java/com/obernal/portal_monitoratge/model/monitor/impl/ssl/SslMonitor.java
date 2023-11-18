@@ -1,12 +1,14 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
 import com.obernal.portal_monitoratge.clients.IgnoreCertificateExpirationTrustManager;
-import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpMonitor;
-import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpResult;
+import com.obernal.portal_monitoratge.model.alert.Assert;
+import com.obernal.portal_monitoratge.model.monitor.Monitor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.http.HttpClient;
@@ -16,25 +18,27 @@ import java.net.http.HttpResponse;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
 import java.util.Properties;
 
-public class SslMonitor extends HttpMonitor {
+public class SslMonitor extends Monitor<SslContext, SslResult> {
     private static final Logger logger = LoggerFactory.getLogger(SslMonitor.class);
 
-    public SslMonitor(SslMetadata metadata, Properties properties) {
-        super(metadata, properties);
+    private final Properties properties;
+
+    public SslMonitor(SslContext context, Properties properties, Assert<SslResult>... asserts) {
+        super(context, asserts);
+        this.properties = properties;
     }
 
     @Override
     protected SslResult perform() throws Exception {
         try {
             KeyManager[] keyManagers = null;
-            if(metadata.isClientCertificate()) {
-                keyManagers = getClientCertificate("src/main/resources/CDA-1_SGNM_00.p12", "1234");
+            if(context.isClientCertificate()) {
+                keyManagers = getClientCertificate(properties.getProperty("http.certificateClient.p12"), properties.getProperty("http.certificateClient.password"));
             }
-            HttpClient client = metadata.getClient(keyManagers, getTrustManagers());
-            HttpRequest request = metadata.getRequest();
+            HttpClient client = context.getClient(keyManagers, getTrustManagers());
+            HttpRequest request = context.getRequest();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return new SslResult(response);
         } catch (HttpConnectTimeoutException e) {
@@ -48,6 +52,19 @@ public class SslMonitor extends HttpMonitor {
         } catch (IOException e) {
             throw new RuntimeException("I/O error occurred when sending or receiving: " + e.getMessage());
         }
+    }
+
+    private KeyManager[] getClientCertificate(String p12Path, String password) {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("PKCS12");
+            keyStore.load(new FileInputStream(p12Path), password.toCharArray());
+            KeyManagerFactory keyMgrFactory = KeyManagerFactory.getInstance("SunX509");
+            keyMgrFactory.init(keyStore, password.toCharArray());
+            return keyMgrFactory.getKeyManagers();
+        } catch (Exception e) {
+            logger.warn("Unable to load client certificate, no certificate will be configured", e);
+        }
+        return null;
     }
 
     private static TrustManager[] getTrustManagers() {
@@ -65,13 +82,6 @@ public class SslMonitor extends HttpMonitor {
             logger.error("Unable to load truststore manager", e);
             return null;
         }
-    }
-
-    @Override
-    protected boolean isAlert(HttpResult result) {
-        LocalDateTime certificateExpiration = ((SslResult) result).getSSLExpirationDate(0);
-        LocalDateTime alertDate = LocalDateTime.now().plusDays(((SslMetadata) metadata).getDaysInAdvance());
-        return alertDate.isAfter(certificateExpiration);
     }
 
 }

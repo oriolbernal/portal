@@ -1,5 +1,6 @@
 package com.obernal.portal_monitoratge.app.persistence;
 
+import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 
 import java.util.Optional;
@@ -7,14 +8,14 @@ import java.util.stream.Stream;
 
 public interface MonitorPersistence {
 
-    Stream<MonitorMetadata> findAll();
+    Stream<MonitorContext> findAll();
 
-    Optional<MonitorMetadata> findById(String id);
+    Optional<MonitorContext> findById(String id);
 
-    MonitorMetadata create(MonitorMetadata monitor);
+    MonitorContext create(MonitorContext context);
 
-    MonitorMetadata update(MonitorMetadata monitor);
+    MonitorContext update(MonitorContext context);
 
-    void deleteById(String id);
+    MonitorContext deleteById(String id);
 
 }

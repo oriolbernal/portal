@@ -1,18 +1,22 @@
 package com.obernal.portal_monitoratge.model;
 
+import com.obernal.portal_monitoratge.model.monitor.Result;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-public class Execution<R> implements Report<R> {
+public class Execution<R extends Result> {
     private final String id;
     private final float elapsedTimeInSeconds;
-    private final boolean alert;
+    private final List<String> alerts;
     private final R data;
     private final Exception exception;
 
-    public Execution(long start, boolean alert, R data) {
+    public Execution(long start, List<String> alerts, R data) {
         this.id = UUID.randomUUID().toString();
         this.elapsedTimeInSeconds = (System.currentTimeMillis() - start) / 1000F;
-        this.alert = alert;
+        this.alerts = alerts;
         this.data = data;
         this.exception = null;
     }
@@ -20,17 +24,15 @@ public class Execution<R> implements Report<R> {
     public Execution(long start, Exception exception) {
         this.id = UUID.randomUUID().toString();
         this.elapsedTimeInSeconds = (System.currentTimeMillis() - start) / 1000F;
-        this.alert = false;
+        this.alerts = new ArrayList<>();
         this.data = null;
         this.exception = exception;
     }
 
-    @Override
     public float getElapsedTimeInSeconds() {
         return elapsedTimeInSeconds;
     }
 
-    @Override
     public R getData() {
         return data;
     }
@@ -40,7 +42,7 @@ public class Execution<R> implements Report<R> {
     }
 
     public boolean isAlert() {
-        return alert;
+        return !alerts.isEmpty();
     }
 
     public boolean isError() {

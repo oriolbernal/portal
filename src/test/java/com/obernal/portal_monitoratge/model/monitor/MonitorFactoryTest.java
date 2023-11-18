@@ -1,11 +1,11 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
 import com.obernal.portal_monitoratge.clients.DbConnectionPool;
-import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMetadata;
+import com.obernal.portal_monitoratge.model.monitor.impl.db.DbContext;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMonitor;
-import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpMetadata;
+import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpContext;
 import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpMonitor;
-import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslMetadata;
+import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslContext;
 import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,23 +29,23 @@ class MonitorFactoryTest {
 
     @Test
     public void testCreate_shouldReturnCorrectMonitor() {
-        testCreate(MonitorType.SSL, SslMetadata.class, SslMonitor.class);
-        testCreate(MonitorType.DB, DbMetadata.class, DbMonitor.class);
-        testCreate(MonitorType.HTTP, HttpMetadata.class, HttpMonitor.class);
+        testCreate(MonitorType.SSL, SslContext.class, SslMonitor.class);
+        testCreate(MonitorType.DB, DbContext.class, DbMonitor.class);
+        testCreate(MonitorType.HTTP, HttpContext.class, HttpMonitor.class);
     }
 
-    public void testCreate(MonitorType type, Class<? extends MonitorMetadata> metadataClass, Class<?> monitorClass) {
-        MonitorMetadata metadata = mock(metadataClass);
-        when(metadata.getType()).thenReturn(type);
-        Monitor<?, ?> monitor = factory.create(metadata);
+    public void testCreate(MonitorType type, Class<? extends MonitorContext> contextClass, Class<?> monitorClass) {
+        MonitorContext context = mock(contextClass);
+        when(context.getType()).thenReturn(type);
+        Monitor<?, ?> monitor = factory.create(context);
         assertEquals(monitorClass, monitor.getClass());
     }
 
     @Test()
     public void testCreate_shouldThrowExceptionForNullType() {
-        MonitorMetadata metadata = mock(MonitorMetadata.class);
-        when(metadata.getType()).thenReturn(null);
-        assertThrows(RuntimeException.class, () -> factory.create(metadata));
+        MonitorContext context = mock(MonitorContext.class);
+        when(context.getType()).thenReturn(null);
+        assertThrows(RuntimeException.class, () -> factory.create(context));
     }
 
 }

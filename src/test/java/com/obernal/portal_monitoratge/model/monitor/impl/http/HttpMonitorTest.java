@@ -1,5 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
+import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -239,15 +240,16 @@ class HttpMonitorTest {
 
     private HttpMonitor createMonitor(String endpoint, String[] sslProtocols, boolean clientCertificate, int statusCode) {
         return new HttpMonitor(
-                new HttpMetadata(
-                        "name",
-                        "desc",
-                        "cron",
-                        "service",
-                        new HashSet<>(),
-                        "docs",
+                new HttpContext(
+                        new MonitorMetadata(
+                                "name",
+                                "desc",
+                                "cron",
+                                "service",
+                                new HashSet<>(),
+                                "docs"),
                         endpoint,
-                        HttpMetadata.RequestMethod.GET,
+                        HttpContext.RequestMethod.GET,
                         null,
                         1,
                         HttpClient.Version.HTTP_2,
@@ -255,22 +257,24 @@ class HttpMonitorTest {
                         sslProtocols,
                         clientCertificate,
                         statusCode,
-                        null
+                        null,
+                        false
                 ),
                 testProperties);
     }
 
     private HttpMonitor createPostMonitor(String endpoint, String body, String expectedBody) {
         return new HttpMonitor(
-                new HttpMetadata(
-                        "name",
-                        "desc",
-                        "cron",
-                        "service",
-                        new HashSet<>(),
-                        "docs",
+                new HttpContext(
+                        new MonitorMetadata(
+                                "name",
+                                "desc",
+                                "cron",
+                                "service",
+                                new HashSet<>(),
+                                "docs"),
                         endpoint,
-                        HttpMetadata.RequestMethod.POST,
+                        HttpContext.RequestMethod.POST,
                         body,
                         1,
                         HttpClient.Version.HTTP_2,
@@ -278,7 +282,8 @@ class HttpMonitorTest {
                         new String[]{"TLSv1.2", "TLSv1.3"},
                         false,
                         200,
-                        expectedBody
+                        expectedBody,
+                        false
                 ),
                 testProperties);
     }

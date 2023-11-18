@@ -1,5 +1,6 @@
 package com.obernal.portal_monitoratge.app.service.impl;
 
+import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import com.obernal.portal_monitoratge.model.monitor.MonitorFactory;
 import com.obernal.portal_monitoratge.model.Execution;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
@@ -27,7 +28,7 @@ public class MonitorServiceImpl implements MonitorService {
 
 
     @Override
-    public Stream<MonitorMetadata> findAll() {
+    public Stream<MonitorContext> findAll() {
         logger.debug("Monitor Service: Finding all monitors");
         return persistence.findAll();
     }
@@ -36,70 +37,69 @@ public class MonitorServiceImpl implements MonitorService {
     public long scheduleActiveMonitors() {
         logger.debug("Monitor Service: Scheduling all active monitors");
         return this.findAll()
-                .filter(MonitorMetadata::isActive)
+                .filter(MonitorContext::isActive)
                 .peek(this::schedule)
                 .count();
     }
 
-    private void schedule(MonitorMetadata metadata) {
+    private void schedule(MonitorContext context) {
+        MonitorMetadata metadata = context.getMetadata();
         logger.info("Scheduling monitor: {} and cron {}", metadata.getId(), metadata.getCron());
         if (metadata.isActive()) {
-            Monitor<?, ?> monitor = factory.create(metadata);
+            Monitor<?, ?> monitor = factory.create(context);
             scheduler.schedule(metadata.getId(), metadata.getCron(), monitor::run);
         }
     }
 
     @Override
-    public MonitorMetadata create(MonitorMetadata metadata) {
-        logger.debug("Monitor Service: Creating new monitor {}", metadata.getId());
-        persistence.create(metadata);
-        return metadata;
+    public MonitorContext create(MonitorContext context) {
+        logger.debug("Monitor Service: Creating new monitor {}", context.getId());
+        return persistence.create(context);
     }
 
     @Override
-    public MonitorMetadata findById(String id) throws NotFoundException {
+    public MonitorContext findById(String id) throws NotFoundException {
         logger.debug("Monitor Service: Find monitor {}", id);
         return this.persistence.findById(id)
                 .orElseThrow(() -> new NotFoundException("Monitor id: " + id));
     }
 
     @Override
-    public MonitorMetadata update(String id, MonitorMetadata metadata) throws NotFoundException {
+    public MonitorContext update(String id, MonitorContext newContext) throws NotFoundException {
         logger.debug("Monitor Service: Updating monitor {}", id);
-        MonitorMetadata existingMonitor = findById(id);
-        existingMonitor.update(metadata);
+        MonitorContext existingMonitor = findById(id);
+        existingMonitor.update(newContext);
         schedule(existingMonitor);
         return persistence.update(existingMonitor);
     }
 
     @Override
-    public MonitorMetadata toggle(String id) throws NotFoundException {
-        MonitorMetadata metadata = findById(id);
-        if (metadata.isActive()) {
+    public MonitorContext toggle(String id) throws NotFoundException {
+        MonitorContext context = findById(id);
+        if (context.isActive()) {
             logger.debug("Disabling monitor: {}", id);
-            scheduler.cancel(metadata.getId());
+            scheduler.cancel(context.getId());
         } else {
             logger.debug("Enabling monitor {}", id);
-            schedule(metadata);
+            schedule(context);
         }
-        metadata.toggle();
-        return persistence.update(metadata);
+        context.toggle();
+        return persistence.update(context);
     }
 
     @Override
-    public MonitorMetadata delete(String id) throws NotFoundException {
+    public MonitorContext delete(String id) throws NotFoundException {
         logger.debug("Monitor Service: Deleting monitor {}", id);
-        MonitorMetadata metadata = findById(id);
-        scheduler.cancel(metadata.getId());
-        persistence.deleteById(id);
-        return metadata;
+        MonitorContext context = findById(id);
+        scheduler.cancel(context.getId());
+        return persistence.deleteById(id);
     }
 
     @Override
     public Execution<?> run(String id) throws NotFoundException {
         logger.debug("Monitor Service: Running monitor {}", id);
-        MonitorMetadata metadata = findById(id);
-        Monitor<?, ?> monitor = factory.create(metadata);
+        MonitorContext context = findById(id);
+        Monitor<?, ?> monitor = factory.create(context);
         return monitor.run();
     }
 

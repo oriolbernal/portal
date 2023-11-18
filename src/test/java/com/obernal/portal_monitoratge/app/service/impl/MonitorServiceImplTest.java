@@ -30,29 +30,29 @@ class MonitorServiceImplTest {
 
     @Test
     public void findAll() {
-        List<MonitorMetadata> monitors = Arrays.asList(
-                new DummyMetadata("md1", "cron1"),
-                new DummyMetadata("md2", "cron2")
+        List<MonitorContext> monitors = Arrays.asList(
+                new DummyContext("md1", "cron1"),
+                new DummyContext("md2", "cron2")
         );
         when(persistence.findAll()).thenReturn(monitors.stream());
-        Stream<MonitorMetadata> result = service.findAll();
+        Stream<MonitorContext> result = service.findAll();
         assertEquals(2, result.count());
     }
 
     @Test
     public void scheduleActiveMonitors() {
-        List<MonitorMetadata> metadatas = Arrays.asList(
-                new DummyMetadata("md1", "cron1"),
-                new DummyMetadata("md2", "cron2", false)
+        List<MonitorContext> metadatas = Arrays.asList(
+                new DummyContext("md1", "cron1"),
+                new DummyContext("md2", "cron2", false)
         );
         when(persistence.findAll()).thenReturn(metadatas.stream());
-        when(factory.create(any(DummyMetadata.class)))
+        when(factory.create(any(DummyContext.class)))
                 .thenAnswer(invocation -> {
-                    DummyMetadata metadata = invocation.getArgument(0);
+                    DummyContext metadata = invocation.getArgument(0);
                     if ("md1".equals(metadata.getId())) {
-                        return new DummyMonitor((DummyMetadata) metadatas.get(0));
+                        return new DummyMonitor((DummyContext) metadatas.get(0));
                     } else {
-                        return new DummyMonitor((DummyMetadata) metadatas.get(1));
+                        return new DummyMonitor((DummyContext) metadatas.get(1));
                     }
                 });
         long scheduledCount = service.scheduleActiveMonitors();
@@ -61,9 +61,9 @@ class MonitorServiceImplTest {
 
     @Test
     public void create() {
-        var metadata = new DummyMetadata("m1", "new_cron");
-        when(persistence.create(any(MonitorMetadata.class))).thenReturn(metadata);
-        var created = service.create(metadata);
+        var metadata = new DummyContext("m1", "new_cron");
+        when(persistence.create(any(MonitorContext.class))).thenReturn(metadata);
+        var created = service.create(metadata).getMetadata();
         assertNotNull(created.getId());
         assertNotNull(created.getCreated());
         assertNull(created.getUpdated());
@@ -72,11 +72,11 @@ class MonitorServiceImplTest {
 
     @Test
     public void findByIdExistingMonitor() throws NotFoundException {
-        var existingMonitor = new DummyMetadata("existing", "cron1");
+        var existingMonitor = new DummyContext("existing", "cron1");
         when(persistence.findById("existing")).thenReturn(Optional.of(existingMonitor));
         var foundMonitor = service.findById("existing");
         assertNotNull(foundMonitor);
-        assertEquals("existing", foundMonitor.getName());
+        assertEquals("existing", foundMonitor.getMetadata().getName());
     }
 
     @Test
@@ -87,52 +87,53 @@ class MonitorServiceImplTest {
 
     @Test
     public void update() throws NotFoundException {
-        var existing = new DummyMetadata("name", "cron1");
+        var existing = new DummyContext("name", "cron1");
         when(persistence.findById(existing.getId())).thenReturn(Optional.of(existing));
-        when(persistence.update(any(MonitorMetadata.class))).thenReturn(existing);
-        var metadata = new DummyMetadata("name", "new cron", false);
+        when(persistence.update(any(MonitorContext.class))).thenReturn(existing);
+        var metadata = new DummyContext("name", "new cron", false);
         var updated = service.update(existing.getId(), metadata);
-        assertNotNull(updated.getUpdated());
-        assertNotEquals(metadata.getUpdated(), updated.getUpdated());
+        assertNotNull(updated.getMetadata().getUpdated());
+        assertNotEquals(metadata.getMetadata().getUpdated(), updated.getMetadata().getUpdated());
         assertEquals(existing.getId(), updated.getId());
-        assertEquals("new cron", updated.getCron());
+        assertEquals("new cron", updated.getMetadata().getCron());
     }
 
     @Test
     public void toggle_enable() throws NotFoundException {
-        var existing = new DummyMetadata("existing", "cron1", false);
+        var existing = new DummyContext("existing", "cron1", false);
         when(persistence.findById("existing")).thenReturn(Optional.of(existing));
-        when(persistence.update(any(MonitorMetadata.class))).thenReturn(existing);
+        when(persistence.update(any(MonitorContext.class))).thenReturn(existing);
         var toggled = service.toggle("existing");
         assertTrue(toggled.isActive());
     }
 
     @Test
     public void toggle_disable() throws NotFoundException {
-        var existing = new DummyMetadata("existing", "cron1", true);
+        var existing = new DummyContext("existing", "cron1", true);
         when(persistence.findById("existing")).thenReturn(Optional.of(existing));
-        when(persistence.update(any(MonitorMetadata.class))).thenReturn(existing);
+        when(persistence.update(any(MonitorContext.class))).thenReturn(existing);
         var toggled = service.toggle("existing");
         assertFalse(toggled.isActive());
     }
 
     @Test
     public void delete() throws NotFoundException {
-        var existing = new DummyMetadata("existing", "cron1");
+        var existing = new DummyContext("existing", "cron1");
         when(persistence.findById("existing")).thenReturn(Optional.of(existing));
+        when(persistence.deleteById("existing")).thenReturn(existing);
         var deletedMonitor = service.delete("existing");
         assertNotNull(deletedMonitor);
     }
 
     @Test
     public void run() throws NotFoundException {
-        var existing = new DummyMetadata("existing", "cron1");
+        var existing = new DummyContext("existing", "cron1");
         var monitor = new DummyMonitor(existing);
         when(persistence.findById("existing")).thenReturn(Optional.of(existing));
-        when(factory.create(any(DummyMetadata.class)))
+        when(factory.create(any(DummyContext.class)))
                 .thenAnswer(invocation -> {
-                    DummyMetadata metadata = invocation.getArgument(0);
-                    if ("existing".equals(metadata.getName())) {
+                    DummyContext metadata = invocation.getArgument(0);
+                    if ("existing".equals(metadata.getMetadata().getName())) {
                         return monitor;
                     } else {
                         return null;
@@ -150,9 +151,9 @@ class MonitorServiceImplTest {
 
 }
 
-class DummyMonitor extends Monitor<DummyMetadata, DummyResult> {
+class DummyMonitor extends Monitor<DummyContext, DummyResult> {
 
-    public DummyMonitor(DummyMetadata metadata) {
+    public DummyMonitor(DummyContext metadata) {
         super(metadata);
     }
 
@@ -162,23 +163,18 @@ class DummyMonitor extends Monitor<DummyMetadata, DummyResult> {
         return new DummyResult();
     }
 
-    @Override
-    public boolean isAlert(DummyResult result) {
-        return metadata.getRandom() >= 0.5;
-    }
-
 }
 
-class DummyMetadata extends MonitorMetadata {
+class DummyContext extends MonitorContext {
     private final double random;
 
-    public DummyMetadata(String name, String cron) {
-        super(name, "description", cron, "service", new HashSet<>(), "documentation");
+    public DummyContext(String name, String cron) {
+        super(new MonitorMetadata(name, "description", cron, "service", new HashSet<>(), "documentation"));
         random = Math.random(); // greater than or equal to 0.0 and less than 1.0
     }
 
-    public DummyMetadata(String name, String cron, boolean active) {
-        super(name, "description", cron, "service", new HashSet<>(), "documentation");
+    public DummyContext(String name, String cron, boolean active) {
+        super(new MonitorMetadata(name, "description", cron, "service", new HashSet<>(), "documentation"));
         if(!active) toggle();
         random = Math.random(); // greater than or equal to 0.0 and less than 1.0
     }
@@ -195,4 +191,7 @@ class DummyMetadata extends MonitorMetadata {
 
 class DummyResult extends Result {
 
+    protected DummyResult() {
+        super();
+    }
 }

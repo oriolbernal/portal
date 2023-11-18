@@ -1,5 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
+import com.obernal.portal_monitoratge.model.alert.Assert;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +18,11 @@ import java.net.http.HttpResponse;
 import java.security.KeyStore;
 import java.util.Properties;
 
-public class HttpMonitor extends Monitor<HttpMetadata, HttpResult> {
+public class HttpMonitor extends Monitor<HttpContext, HttpResult> {
     private static final Logger logger = LoggerFactory.getLogger(HttpMonitor.class);
     private final Properties properties;
-    public HttpMonitor(HttpMetadata metadata, Properties properties) {
-        super(metadata);
+    public HttpMonitor(HttpContext context, Properties properties, Assert<HttpResult>... asserts) {
+        super(context, asserts);
         this.properties = properties;
     }
 
@@ -29,11 +30,11 @@ public class HttpMonitor extends Monitor<HttpMetadata, HttpResult> {
     protected HttpResult perform() throws Exception {
         try {
             KeyManager[] keyManagers = null;
-            if(metadata.isClientCertificate()) {
+            if(context.isClientCertificate()) {
                 keyManagers = getClientCertificate(properties.getProperty("http.certificateClient.p12"), properties.getProperty("http.certificateClient.password"));
             }
-            HttpClient client = metadata.getClient(keyManagers, null);
-            HttpRequest request = metadata.getRequest();
+            HttpClient client = context.getClient(keyManagers, null);
+            HttpRequest request = context.getRequest();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return new HttpResult(response);
         } catch (HttpConnectTimeoutException e) {
@@ -60,14 +61,6 @@ public class HttpMonitor extends Monitor<HttpMetadata, HttpResult> {
             logger.warn("Unable to load client certificate, no certificate will be configured", e);
         }
         return null;
-    }
-
-    @Override
-    protected boolean isAlert(HttpResult result) {
-        if(metadata.getStatusCode() != null && result.getStatusCode() != metadata.getStatusCode()) {
-            return true;
-        }
-        return metadata.getExpectedBody() != null && !result.getBody().contains(metadata.getExpectedBody());
     }
 
 }

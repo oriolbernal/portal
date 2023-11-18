@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-public abstract class MonitorMetadata {
+public class MonitorMetadata {
 
     private final String id;
     private final LocalDateTime created;
@@ -42,9 +42,6 @@ public abstract class MonitorMetadata {
         this.documentation = documentation;
         this.active = active;
     }
-
-    public abstract MonitorType getType();
-
     public void toggle() {
         active = !active;
     }

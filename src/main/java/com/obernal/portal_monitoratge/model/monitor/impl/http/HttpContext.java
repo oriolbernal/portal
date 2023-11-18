@@ -1,5 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
+import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 import com.obernal.portal_monitoratge.model.monitor.MonitorType;
 
@@ -11,10 +12,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.Set;
 
-public class HttpMetadata extends MonitorMetadata {
+public class HttpContext extends MonitorContext {
     private final String endpoint;
     private final RequestMethod method;
     private final HttpRequest.BodyPublisher publisher;
@@ -23,11 +22,12 @@ public class HttpMetadata extends MonitorMetadata {
     private final HttpClient.Redirect redirect;
     private final SSLParameters sslParameters;
     private final boolean clientCertificate;
-    private final Integer statusCode;
+    private final Integer expectedStatusCode;
     private final String expectedBody;
+    private final boolean strictCompare;
 
-    public HttpMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, String endpoint, RequestMethod method, String body, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, boolean clientCertificate, Integer statusCode, String expectedBody) {
-        super(name, description, cron, service, labels, documentation);
+    public HttpContext(MonitorMetadata context, String endpoint, RequestMethod method, String body, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, boolean clientCertificate, Integer expectedStatusCode, String expectedBody, boolean strictCompare) {
+        super(context);
         this.endpoint = endpoint;
         this.method = method;
         this.publisher = body != null ? HttpRequest.BodyPublishers.ofString(body) : null;
@@ -37,23 +37,9 @@ public class HttpMetadata extends MonitorMetadata {
         sslParameters = new SSLParameters();
         sslParameters.setProtocols(sslProtocols);
         this.clientCertificate = clientCertificate;
-        this.statusCode = statusCode;
+        this.expectedStatusCode = expectedStatusCode;
         this.expectedBody = expectedBody;
-    }
-
-    public HttpMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active, String endpoint, RequestMethod method, String body, int timeOutInSeconds, HttpClient.Version version, HttpClient.Redirect redirect, String[] sslProtocols, boolean clientCertificate, Integer statusCode, String expectedBody) {
-        super(id, created, updated, name, description, cron, service, labels, documentation, active);
-        this.endpoint = endpoint;
-        this.method = method;
-        this.publisher = body != null ? HttpRequest.BodyPublishers.ofString(body) : null;
-        this.timeOutInSeconds = timeOutInSeconds;
-        this.version = version;
-        this.redirect = redirect;
-        sslParameters = new SSLParameters();
-        sslParameters.setProtocols(sslProtocols);
-        this.clientCertificate = clientCertificate;
-        this.statusCode = statusCode;
-        this.expectedBody = expectedBody;
+        this.strictCompare = strictCompare;
     }
 
     @Override
@@ -113,8 +99,8 @@ public class HttpMetadata extends MonitorMetadata {
         return sslParameters;
     }
 
-    public Integer getStatusCode() {
-        return statusCode;
+    public Integer getExpectedStatusCode() {
+        return expectedStatusCode;
     }
 
     public String getExpectedBody() {
@@ -123,6 +109,10 @@ public class HttpMetadata extends MonitorMetadata {
 
     public boolean isClientCertificate() {
         return clientCertificate;
+    }
+
+    public boolean isStrictCompare() {
+        return strictCompare;
     }
 
     public enum RequestMethod {
