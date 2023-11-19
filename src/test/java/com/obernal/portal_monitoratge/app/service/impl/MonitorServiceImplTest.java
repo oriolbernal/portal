@@ -1,5 +1,6 @@
 package com.obernal.portal_monitoratge.app.service.impl;
 
+import com.obernal.portal_monitoratge.model.Result;
 import com.obernal.portal_monitoratge.model.monitor.*;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 import com.obernal.portal_monitoratge.app.service.MonitorService;
@@ -173,12 +174,12 @@ class DummyContext extends MonitorContext {
     private final double random;
 
     public DummyContext(String name, String cron) {
-        super(new MonitorMetadata(name, "description", cron, "service", new HashSet<>(), "documentation"));
+        super(new MonitorMetadata(name, "description", cron, "service", new HashSet<>(), "documentation", 0));
         random = Math.random(); // greater than or equal to 0.0 and less than 1.0
     }
 
     public DummyContext(String name, String cron, boolean active) {
-        super(new MonitorMetadata(name, "description", cron, "service", new HashSet<>(), "documentation"));
+        super(new MonitorMetadata(name, "description", cron, "service", new HashSet<>(), "documentation", 0));
         if(!active) toggle();
         random = Math.random(); // greater than or equal to 0.0 and less than 1.0
     }

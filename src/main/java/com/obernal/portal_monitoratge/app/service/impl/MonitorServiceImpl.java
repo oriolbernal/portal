@@ -2,7 +2,7 @@ package com.obernal.portal_monitoratge.app.service.impl;
 
 import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import com.obernal.portal_monitoratge.model.monitor.MonitorFactory;
-import com.obernal.portal_monitoratge.model.Execution;
+import com.obernal.portal_monitoratge.model.execution.Execution;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 import com.obernal.portal_monitoratge.app.service.MonitorService;

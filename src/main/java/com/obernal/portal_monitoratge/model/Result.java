@@ -1,4 +1,4 @@
-package com.obernal.portal_monitoratge.model.monitor;
+package com.obernal.portal_monitoratge.model;
 
 import java.util.HashMap;
 import java.util.Map;

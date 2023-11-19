@@ -1,6 +1,6 @@
-package com.obernal.portal_monitoratge.model;
+package com.obernal.portal_monitoratge.model.execution;
 
-import com.obernal.portal_monitoratge.model.monitor.Result;
+import com.obernal.portal_monitoratge.model.Result;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
-import com.obernal.portal_monitoratge.model.monitor.Result;
+import com.obernal.portal_monitoratge.model.Result;
 
 import java.net.http.HttpResponse;
 import java.util.*;

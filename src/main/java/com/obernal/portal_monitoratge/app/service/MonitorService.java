@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.app.service;
 
-import com.obernal.portal_monitoratge.model.Execution;
+import com.obernal.portal_monitoratge.model.execution.Execution;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
 import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 

@@ -1,6 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
-import com.obernal.portal_monitoratge.model.Execution;
+import com.obernal.portal_monitoratge.model.execution.Execution;
+import com.obernal.portal_monitoratge.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ public abstract class Monitor<C extends MonitorContext, R extends Result> {
         try {
             R result = perform();
             List<String> alerts = getAlerts(result);
+            context.changeState(!alerts.isEmpty());
             return new Execution<>(start, result, alerts);
         } catch (Exception exception) {
             logger.error("Error executing monitor: {} --> {}", getId(), exception.getMessage(), exception);

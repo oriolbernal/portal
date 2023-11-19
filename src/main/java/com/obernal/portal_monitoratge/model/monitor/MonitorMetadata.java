@@ -16,8 +16,9 @@ public class MonitorMetadata {
     private Set<String> labels;
     private String documentation;
     private boolean active;
+    private int insistAfter;
 
-    public MonitorMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation) {
+    public MonitorMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, int insistAfter) {
         this.id = UUID.randomUUID().toString();
         created = LocalDateTime.now();
         updated = null;
@@ -28,9 +29,10 @@ public class MonitorMetadata {
         this.labels = labels;
         this.documentation = documentation;
         this.active = true;
+        this.insistAfter = insistAfter;
     }
 
-    public MonitorMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active) {
+    public MonitorMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active, int insistAfter) {
         this.id = id;
         this.created = created;
         this.updated = updated;
@@ -41,7 +43,9 @@ public class MonitorMetadata {
         this.labels = labels;
         this.documentation = documentation;
         this.active = active;
+        this.insistAfter = insistAfter;
     }
+
     public void toggle() {
         active = !active;
     }
@@ -54,6 +58,7 @@ public class MonitorMetadata {
         this.labels = metadata.getLabels();
         this.documentation = metadata.getDocumentation();
         this.active = metadata.isActive();
+        this.insistAfter = metadata.getInsistAfter();
         this.updated = LocalDateTime.now();
     }
 
@@ -97,4 +102,7 @@ public class MonitorMetadata {
         return active;
     }
 
+    public int getInsistAfter() {
+        return insistAfter;
+    }
 }
