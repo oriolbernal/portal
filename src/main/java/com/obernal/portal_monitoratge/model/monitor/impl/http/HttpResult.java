@@ -1,24 +1,14 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
-import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import com.obernal.portal_monitoratge.model.monitor.Result;
-import org.json.JSONException;
-import org.skyscreamer.jsonassert.JSONCompare;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import java.net.http.HttpResponse;
 import java.util.*;
 
 public class HttpResult extends Result {
-    //private final Integer expectedStatusCode;
-   // private final String expectedBody;
-    //private final boolean strictCompare;
 
     public HttpResult(HttpResponse<String> response) {
         super();
-        //this.expectedStatusCode = context.getExpectedStatusCode();
-        //this.expectedBody = context.getExpectedBody();
-        //this.strictCompare = context.isStrictCompare();
         data.put("headers", response.headers().map());
         data.put("body", response.body());
         data.put("statusCode", response.statusCode());

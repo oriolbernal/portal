@@ -216,16 +216,30 @@ class HttpMonitorTest {
     }
 
     @Test
-    void alert_with_expectedBody() {
+    void alert_with_expectedBody_nonStrictMode() {
         var monitor = createPostMonitor(
                 "https://httpbin.org/anything",
                 "Hello world",
-                "\"data\": \"Hello world\""
+                "{\"data\": \"Hello world\"}", false
         );
         var execution = monitor.run();
         assertFalse(execution.isError());
         assertFalse(execution.isAlert());
     }
+
+    @Test
+    void alert_with_expectedBody_strictMode() {
+        var monitor = createPostMonitor(
+                "https://httpbin.org/anything",
+                "Hello world",
+                "{\"data\": \"Hello world\"}",
+                true
+        );
+        var execution = monitor.run();
+        assertFalse(execution.isError());
+        assertTrue(execution.isAlert());
+    }
+
 
     private Properties loadTestProperties() throws Exception {
         Properties properties = new Properties();
@@ -263,7 +277,7 @@ class HttpMonitorTest {
                 testProperties);
     }
 
-    private HttpMonitor createPostMonitor(String endpoint, String body, String expectedBody) {
+    private HttpMonitor createPostMonitor(String endpoint, String body, String expectedBody, boolean strict) {
         return new HttpMonitor(
                 new HttpContext(
                         new MonitorMetadata(
@@ -283,7 +297,7 @@ class HttpMonitorTest {
                         false,
                         200,
                         expectedBody,
-                        false
+                        strict
                 ),
                 testProperties);
     }

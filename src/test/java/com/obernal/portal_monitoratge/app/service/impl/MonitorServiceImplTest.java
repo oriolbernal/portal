@@ -163,6 +163,10 @@ class DummyMonitor extends Monitor<DummyContext, DummyResult> {
         return new DummyResult();
     }
 
+    @Override
+    public List<String> getAlerts(DummyResult result) {
+        return new ArrayList<>();
+    }
 }
 
 class DummyContext extends MonitorContext {

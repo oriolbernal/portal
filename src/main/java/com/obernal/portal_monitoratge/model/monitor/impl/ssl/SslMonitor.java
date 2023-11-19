@@ -1,7 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
 import com.obernal.portal_monitoratge.clients.IgnoreCertificateExpirationTrustManager;
-import com.obernal.portal_monitoratge.model.alert.Assert;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
 
 import org.slf4j.Logger;
@@ -18,6 +17,9 @@ import java.net.http.HttpResponse;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class SslMonitor extends Monitor<SslContext, SslResult> {
@@ -25,8 +27,8 @@ public class SslMonitor extends Monitor<SslContext, SslResult> {
 
     private final Properties properties;
 
-    public SslMonitor(SslContext context, Properties properties, Assert<SslResult>... asserts) {
-        super(context, asserts);
+    public SslMonitor(SslContext context, Properties properties) {
+        super(context);
         this.properties = properties;
     }
 
@@ -84,4 +86,14 @@ public class SslMonitor extends Monitor<SslContext, SslResult> {
         }
     }
 
+    @Override
+    public List<String> getAlerts(SslResult result) {
+        List<String> alerts = new ArrayList<>();
+        LocalDateTime certificateExpiration = result.getSSLExpirationDate(0);
+        LocalDateTime alertDate = LocalDateTime.now().plusDays(context.getDaysInAdvance());
+        if(alertDate.isAfter(certificateExpiration)) {
+            alerts.add("SSL Certificate expires in les than " + context.getDaysInAdvance() + " days: " + result.getSSLExpirationDate(0));
+        }
+        return alerts;
+    }
 }

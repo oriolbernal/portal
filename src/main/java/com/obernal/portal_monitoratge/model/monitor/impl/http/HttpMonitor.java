@@ -1,7 +1,9 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
-import com.obernal.portal_monitoratge.model.alert.Assert;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
+import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONCompare;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +18,15 @@ import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class HttpMonitor extends Monitor<HttpContext, HttpResult> {
     private static final Logger logger = LoggerFactory.getLogger(HttpMonitor.class);
     private final Properties properties;
-    public HttpMonitor(HttpContext context, Properties properties, Assert<HttpResult>... asserts) {
-        super(context, asserts);
+    public HttpMonitor(HttpContext context, Properties properties) {
+        super(context);
         this.properties = properties;
     }
 
@@ -61,6 +65,30 @@ public class HttpMonitor extends Monitor<HttpContext, HttpResult> {
             logger.warn("Unable to load client certificate, no certificate will be configured", e);
         }
         return null;
+    }
+
+    @Override
+    public List<String> getAlerts(HttpResult result) throws Exception {
+        List<String> alerts = new ArrayList<>();
+        if(context.getExpectedStatusCode() != null && checkStatusCode(result.getStatusCode())){
+            alerts.add("StatusCode (" + result.getStatusCode() + ") does not coincide with expected (" + context.getExpectedStatusCode() + ")");
+        }
+        if(context.getExpectedBody() != null && checkBody(result.getBody())) {
+            alerts.add("Body (" + result.getBody() +  ") does not coincide (" + (context.isStrictCompare() ? "strict" : "non-strict") + " mode) with expected (" + context.getExpectedBody() + ") and responseBody (" + result.getBody()+ ")");
+        }
+        return alerts;
+    }
+
+    private boolean checkStatusCode(Integer statusCode) {
+        return !context.getExpectedStatusCode().equals(statusCode);
+    }
+
+    private boolean checkBody(String body) throws JSONException {
+        return !JSONCompare.compareJSON(
+                context.getExpectedBody(),
+                body,
+                context.isStrictCompare() ? JSONCompareMode.STRICT : JSONCompareMode.LENIENT
+        ).passed();
     }
 
 }

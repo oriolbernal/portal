@@ -1,9 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
 import com.obernal.portal_monitoratge.clients.DbConnectionPool;
-import com.obernal.portal_monitoratge.model.alert.impl.JsonAssert;
-import com.obernal.portal_monitoratge.model.alert.impl.MinMaxAssert;
-import com.obernal.portal_monitoratge.model.alert.impl.SslExpirationDateAssert;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbContext;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMonitor;
 import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpContext;
@@ -35,18 +32,15 @@ public class MonitorFactory {
     }
 
     private HttpMonitor create(HttpContext context) {
-        var cAssert = new JsonAssert(context.getExpectedBody(), false);
-        return new HttpMonitor(context, properties, cAssert);
+        return new HttpMonitor(context, properties);
     }
 
     private SslMonitor create(SslContext context) {
-        var cAssert = new SslExpirationDateAssert(context.getDaysInAdvance());
-        return new SslMonitor(context, properties, cAssert);
+        return new SslMonitor(context, properties);
     }
 
     private DbMonitor create(DbContext context) {
-        var cAssert = new MinMaxAssert(context.getMinValue(), context.getMaxValue());
-        return new DbMonitor(context, connectionPool, cAssert);
+        return new DbMonitor(context, connectionPool);
     }
 
 }
