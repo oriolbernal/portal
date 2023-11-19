@@ -9,23 +9,23 @@ import java.util.UUID;
 public class Execution<R extends Result> {
     private final String id;
     private final float elapsedTimeInSeconds;
-    private final List<String> alerts;
     private final R data;
+    private final List<String> alerts;
     private final Exception exception;
 
-    public Execution(long start, List<String> alerts, R data) {
+    public Execution(long start, R data, List<String> alerts) {
         this.id = UUID.randomUUID().toString();
         this.elapsedTimeInSeconds = (System.currentTimeMillis() - start) / 1000F;
-        this.alerts = alerts;
         this.data = data;
+        this.alerts = alerts;
         this.exception = null;
     }
 
     public Execution(long start, Exception exception) {
         this.id = UUID.randomUUID().toString();
         this.elapsedTimeInSeconds = (System.currentTimeMillis() - start) / 1000F;
-        this.alerts = new ArrayList<>();
         this.data = null;
+        this.alerts = new ArrayList<>();
         this.exception = exception;
     }
 

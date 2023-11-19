@@ -43,21 +43,5 @@ public class DbResult extends Result {
     public int getRows() {
         return (int) data.get("rows");
     }
-/*
-    @Override
-    public boolean isAlert() {
-        String firstKey = new ArrayList<>(result.getTable().get(0).keySet()).get(0);
-        String firstValue = result.getTable().get(0).get(firstKey);
-        long number = Long.parseLong(firstValue);
-        if (max == null) return number < min;
-        else if (min == null) return number > max;
-        else return number > max || number < min;
-    }
 
-    @Override
-    public List<String> getAlertMessages() {
-        return null;
-    }
-
- */
 }

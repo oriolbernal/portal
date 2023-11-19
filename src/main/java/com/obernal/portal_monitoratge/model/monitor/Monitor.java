@@ -25,7 +25,7 @@ public abstract class Monitor<C extends MonitorContext, R extends Result> {
         try {
             R result = perform();
             List<String> alerts = getAlerts(result);
-            return new Execution<>(start, alerts, result);
+            return new Execution<>(start, result, alerts);
         } catch (Exception exception) {
             logger.error("Error executing monitor: {} --> {}", getId(), exception.getMessage(), exception);
             return new Execution<>(start, exception);
