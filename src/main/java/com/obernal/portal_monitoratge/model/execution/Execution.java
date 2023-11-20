@@ -1,12 +1,10 @@
 package com.obernal.portal_monitoratge.model.execution;
 
-import com.obernal.portal_monitoratge.model.Result;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Execution<R extends Result> {
+public class Execution<R> {
     private final String id;
     private final float elapsedTimeInSeconds;
     private final R data;
