@@ -26,7 +26,6 @@ public class MonitorServiceImpl implements MonitorService {
         this.factory = factory;
     }
 
-
     @Override
     public Stream<MonitorContext> findAll() {
         logger.debug("Monitor Service: Finding all monitors");
