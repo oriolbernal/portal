@@ -1,21 +1,21 @@
 package com.obernal.portal_monitoratge.model.execution;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.obernal.portal_monitoratge.model.Alert;
+
 import java.util.UUID;
 
 public class Execution<R> {
     private final String id;
     private final float elapsedTimeInSeconds;
     private final R data;
-    private final List<String> alerts;
+    private final Alert alert;
     private final Exception exception;
 
-    public Execution(long start, R data, List<String> alerts) {
+    public Execution(long start, R data, Alert alert) {
         this.id = UUID.randomUUID().toString();
         this.elapsedTimeInSeconds = (System.currentTimeMillis() - start) / 1000F;
         this.data = data;
-        this.alerts = alerts;
+        this.alert = alert;
         this.exception = null;
     }
 
@@ -23,7 +23,7 @@ public class Execution<R> {
         this.id = UUID.randomUUID().toString();
         this.elapsedTimeInSeconds = (System.currentTimeMillis() - start) / 1000F;
         this.data = null;
-        this.alerts = new ArrayList<>();
+        this.alert = null;
         this.exception = exception;
     }
 
@@ -40,7 +40,7 @@ public class Execution<R> {
     }
 
     public boolean isAlert() {
-        return !alerts.isEmpty();
+        return alert != null;
     }
 
     public boolean isError() {

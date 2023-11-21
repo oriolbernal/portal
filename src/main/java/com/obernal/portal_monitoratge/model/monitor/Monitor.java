@@ -1,11 +1,13 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
+import com.obernal.portal_monitoratge.model.Alert;
 import com.obernal.portal_monitoratge.model.execution.Execution;
 import com.obernal.portal_monitoratge.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 public abstract class Monitor<C extends MonitorContext, R extends Result> {
     private static final Logger logger = LoggerFactory.getLogger(Monitor.class);
@@ -25,9 +27,12 @@ public abstract class Monitor<C extends MonitorContext, R extends Result> {
         long start = System.currentTimeMillis();
         try {
             R result = perform();
-            List<String> alerts = getAlerts(result);
-            context.changeState(!alerts.isEmpty());
-            return new Execution<>(start, result, alerts);
+            var alert = computeAlert(result);
+            if(alert.isPresent()) {
+                context.changeState(true);
+                return new Execution<>(start, result, alert.get());
+            }
+            return new Execution<>(start, result, null);
         } catch (Exception exception) {
             logger.error("Error executing monitor: {} --> {}", getId(), exception.getMessage(), exception);
             return new Execution<>(start, exception);
@@ -36,5 +41,13 @@ public abstract class Monitor<C extends MonitorContext, R extends Result> {
 
     protected abstract R perform() throws Exception;
     protected abstract List<String> getAlerts(R result) throws Exception;
+
+    protected Optional<Alert> computeAlert(R result) throws Exception {
+        List<String> messages = getAlerts(result);
+        if(messages.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(new Alert(messages));
+    }
 
 }
