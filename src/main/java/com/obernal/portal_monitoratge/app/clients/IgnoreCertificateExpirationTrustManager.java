@@ -1,4 +1,4 @@
-package com.obernal.portal_monitoratge.clients;
+package com.obernal.portal_monitoratge.app.clients;
 
 import javax.net.ssl.X509TrustManager;
 import java.math.BigInteger;

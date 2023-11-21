@@ -1,11 +1,12 @@
-package com.obernal.portal_monitoratge.model;
+package com.obernal.portal_monitoratge.model.monitor;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Result {
+public abstract class MonitorResult {
     protected final Map<String, Object> data;
-    public Result() {
+    public MonitorResult() {
         this.data = new HashMap<>();
     }
+
 }

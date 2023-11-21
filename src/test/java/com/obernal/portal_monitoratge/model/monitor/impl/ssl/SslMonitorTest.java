@@ -52,14 +52,15 @@ class SslMonitorTest {
 
     private SslMonitor createMonitor(String endpoint, String[] sslProtocols) {
         return new SslMonitor(
+                null,
                 new SslContext(
                         new MonitorMetadata(
-                        "name",
-                        "desc",
-                        "cron",
-                        "service",
-                        new HashSet<>(),
-                        "docs",
+                                "name",
+                                "desc",
+                                "cron",
+                                "service",
+                                new HashSet<>(),
+                                "docs",
                                 0),
                         endpoint,
                         1,

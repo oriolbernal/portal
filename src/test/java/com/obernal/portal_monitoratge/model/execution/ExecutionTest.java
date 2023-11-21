@@ -1,6 +1,7 @@
 package com.obernal.portal_monitoratge.model.execution;
 
-import com.obernal.portal_monitoratge.model.Alert;
+import com.obernal.portal_monitoratge.model.alert.Alert;
+import com.obernal.portal_monitoratge.model.alert.AlertType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,7 +30,12 @@ class ExecutionTest {
 
     @Test
     void isAlert() {
-        Alert alert = new Alert(List.of("Message1", "Message2"));
+        Alert alert = new Alert(List.of("Message1", "Message2")) {
+            @Override
+            public AlertType getType() {
+                return null;
+            }
+        };
         var execution = new Execution<>(10000, null, alert);
         assertTrue(execution.isAlert());
     }

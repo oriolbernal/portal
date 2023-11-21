@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.db;
 
-import com.obernal.portal_monitoratge.model.Result;
+import com.obernal.portal_monitoratge.model.monitor.MonitorResult;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DbResult extends Result {
+public class DbResult extends MonitorResult {
 
     public DbResult(ResultSet result) throws SQLException {
         super();

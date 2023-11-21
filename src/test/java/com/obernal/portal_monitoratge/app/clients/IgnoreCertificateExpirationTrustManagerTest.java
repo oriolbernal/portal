@@ -1,4 +1,4 @@
-package com.obernal.portal_monitoratge.clients;
+package com.obernal.portal_monitoratge.app.clients;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

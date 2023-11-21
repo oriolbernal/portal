@@ -1,6 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
-import com.obernal.portal_monitoratge.clients.IgnoreCertificateExpirationTrustManager;
+import com.obernal.portal_monitoratge.app.service.AlertService;
+import com.obernal.portal_monitoratge.app.clients.IgnoreCertificateExpirationTrustManager;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
 
 import org.slf4j.Logger;
@@ -27,8 +28,8 @@ public class SslMonitor extends Monitor<SslContext, SslResult> {
 
     private final Properties properties;
 
-    public SslMonitor(SslContext context, Properties properties) {
-        super(context);
+    public SslMonitor(AlertService alertService, SslContext context, Properties properties) {
+        super(alertService, context);
         this.properties = properties;
     }
 

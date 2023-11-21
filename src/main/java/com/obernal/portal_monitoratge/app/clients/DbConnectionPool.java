@@ -1,4 +1,4 @@
-package com.obernal.portal_monitoratge.clients;
+package com.obernal.portal_monitoratge.app.clients;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

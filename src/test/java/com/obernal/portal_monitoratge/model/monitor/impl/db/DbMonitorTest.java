@@ -1,19 +1,28 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.db;
 
-import com.obernal.portal_monitoratge.clients.DbConnectionPool;
+import com.obernal.portal_monitoratge.app.clients.DbConnectionPool;
+import com.obernal.portal_monitoratge.app.service.AlertService;
+import com.obernal.portal_monitoratge.model.alert.Alert;
+import com.obernal.portal_monitoratge.model.alert.AlertType;
+import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
+import com.obernal.portal_monitoratge.model.monitor.MonitorResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class DbMonitorTest {
 
+    private AlertService alertService;
     private DbConnectionPool connectionPool;
     private Connection connection;
     private Statement statement;
@@ -22,6 +31,7 @@ class DbMonitorTest {
 
     @BeforeEach
     public void setup() {
+        alertService = mock(AlertService.class);
         connectionPool = mock(DbConnectionPool.class);
         connection = mock(Connection.class);
         statement = mock(Statement.class);
@@ -52,6 +62,7 @@ class DbMonitorTest {
         when(metaData.getColumnLabel(1)).thenReturn(key);
         when(result.getString(1)).thenReturn(value);
     }
+
     @Test
     public void error_if_criteria_notConfigured() throws SQLException, ClassNotFoundException {
         var monitor = createMonitor(null, null, null);
@@ -64,15 +75,26 @@ class DbMonitorTest {
     public void alert_min() throws SQLException, ClassNotFoundException {
         var monitor = createMonitor(2L, null, null);
         mockData("key", "1");
+        mockAlert();
         var execution = monitor.run();
         assertFalse(execution.isError());
         assertTrue(execution.isAlert());
+    }
+
+    private void mockAlert() {
+        when(alertService.alert(any(MonitorContext.class), any(MonitorResult.class), any(List.class))).thenReturn(new Alert(new ArrayList<>()) {
+            @Override
+            public AlertType getType() {
+                return null;
+            }
+        });
     }
 
     @Test
     public void alert_max() throws SQLException, ClassNotFoundException {
         var monitor = createMonitor(null, 2L, null);
         mockData("key", "3");
+        mockAlert();
         var execution = monitor.run();
         assertFalse(execution.isError());
         assertTrue(execution.isAlert());
@@ -91,6 +113,7 @@ class DbMonitorTest {
     public void alert_searchWord() throws SQLException, ClassNotFoundException {
         var monitor = createMonitor(null, null, "word");
         mockData("key", "testWord");
+        mockAlert();
         var execution = monitor.run();
         assertFalse(execution.isError());
         assertTrue(execution.isAlert());
@@ -100,6 +123,7 @@ class DbMonitorTest {
     public void alert_minMax_with_searchWord() throws SQLException, ClassNotFoundException {
         var monitor = createMonitor(1L, 3L, "test");
         mockData("key", "testWord");
+        mockAlert();
         var execution = monitor.run();
         assertFalse(execution.isError());
         assertTrue(execution.isAlert());
@@ -108,6 +132,7 @@ class DbMonitorTest {
 
     private DbMonitor createMonitor(Long min, Long max, String word) {
         return new DbMonitor(
+                alertService,
                 new DbContext(
                         new MonitorMetadata(
                                 "name",

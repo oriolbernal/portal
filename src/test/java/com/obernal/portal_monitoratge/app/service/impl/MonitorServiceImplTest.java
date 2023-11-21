@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.app.service.impl;
 
-import com.obernal.portal_monitoratge.model.Result;
+import com.obernal.portal_monitoratge.model.monitor.MonitorResult;
 import com.obernal.portal_monitoratge.model.monitor.*;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 import com.obernal.portal_monitoratge.app.service.MonitorService;
@@ -155,7 +155,7 @@ class MonitorServiceImplTest {
 class DummyMonitor extends Monitor<DummyContext, DummyResult> {
 
     public DummyMonitor(DummyContext metadata) {
-        super(metadata);
+        super(null, metadata);
     }
 
     @Override
@@ -194,7 +194,7 @@ class DummyContext extends MonitorContext {
     }
 }
 
-class DummyResult extends Result {
+class DummyResult extends MonitorResult {
 
     protected DummyResult() {
         super();

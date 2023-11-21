@@ -1,6 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
-import com.obernal.portal_monitoratge.clients.DbConnectionPool;
+import com.obernal.portal_monitoratge.app.service.AlertService;
+import com.obernal.portal_monitoratge.app.clients.DbConnectionPool;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbContext;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMonitor;
 import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpContext;
@@ -13,10 +14,12 @@ import java.util.Properties;
 public class MonitorFactory {
 
     private final Properties properties;
+    private final AlertService alertService;
     private final DbConnectionPool connectionPool;
 
-    public MonitorFactory(Properties properties, DbConnectionPool connectionPool) {
+    public MonitorFactory(Properties properties, AlertService alertService, DbConnectionPool connectionPool) {
         this.properties = properties;
+        this.alertService = alertService;
         this.connectionPool = connectionPool;
     }
 
@@ -32,15 +35,15 @@ public class MonitorFactory {
     }
 
     private HttpMonitor create(HttpContext context) {
-        return new HttpMonitor(context, properties);
+        return new HttpMonitor(alertService, context, properties);
     }
 
     private SslMonitor create(SslContext context) {
-        return new SslMonitor(context, properties);
+        return new SslMonitor(alertService, context, properties);
     }
 
     private DbMonitor create(DbContext context) {
-        return new DbMonitor(context, connectionPool);
+        return new DbMonitor(alertService, context, connectionPool);
     }
 
 }

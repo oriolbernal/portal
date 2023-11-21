@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.model.execution;
 
-import com.obernal.portal_monitoratge.model.Alert;
+import com.obernal.portal_monitoratge.model.alert.Alert;
 
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
-import com.obernal.portal_monitoratge.clients.DbConnectionPool;
+import com.obernal.portal_monitoratge.app.clients.DbConnectionPool;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbContext;
 import com.obernal.portal_monitoratge.model.monitor.impl.db.DbMonitor;
 import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpContext;
@@ -24,7 +24,7 @@ class MonitorFactoryTest {
     void setUp() {
         Properties properties = mock(Properties.class);
         DbConnectionPool connectionPool = mock(DbConnectionPool.class);
-        factory = new MonitorFactory(properties, connectionPool);
+        factory = new MonitorFactory(properties, null, connectionPool);
     }
 
     @Test
