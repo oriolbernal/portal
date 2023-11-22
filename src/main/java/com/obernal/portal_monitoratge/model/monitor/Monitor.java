@@ -2,6 +2,8 @@ package com.obernal.portal_monitoratge.model.monitor;
 
 import com.obernal.portal_monitoratge.app.service.AlertService;
 import com.obernal.portal_monitoratge.model.alert.Alert;
+import com.obernal.portal_monitoratge.model.alert.AlertContext;
+import com.obernal.portal_monitoratge.model.alert.AlertFactory;
 import com.obernal.portal_monitoratge.model.execution.Execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +49,18 @@ public abstract class Monitor<C extends MonitorContext, R extends MonitorResult>
     }
 
     private Alert computeAlert(R result, List<String> messages) {
+        logger.info("Sending notification for monitor: " + getId());
+        if(messages.isEmpty()) return null;
+        return new Alert(messages);
+        /*
+        Alert<AlertContext, R> alert = new AlertFactory(null).create(context.notification);
         return switch (context.state) {
-            case FIRST_ALERT -> alertService.alert(context, result, messages);
-            case INSIST -> alertService.insist(context, result, messages);
-            case RECOVERY -> alertService.recover(context, result);
+            case FIRST_ALERT -> alert.alert(result, messages);
+            case INSIST -> alert.insist(result, messages);
+            case RECOVERY -> alert.recover(result);
             case OK, ALERT -> null;
         };
+         */
     }
+
 }

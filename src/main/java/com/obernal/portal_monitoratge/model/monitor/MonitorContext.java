@@ -1,5 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
+import com.obernal.portal_monitoratge.model.alert.AlertContext;
+
 import java.util.UUID;
 
 public abstract class MonitorContext {
@@ -27,7 +29,7 @@ public abstract class MonitorContext {
     }
 
     public void update(MonitorContext newContext) {
-        this.metadata.update(newContext.getMetadata());
+        metadata.update(newContext.getMetadata());
     }
 
     public void toggle() {

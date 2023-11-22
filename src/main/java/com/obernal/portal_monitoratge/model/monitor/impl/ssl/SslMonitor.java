@@ -1,7 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
 import com.obernal.portal_monitoratge.app.service.AlertService;
-import com.obernal.portal_monitoratge.app.clients.IgnoreCertificateExpirationTrustManager;
+import com.obernal.portal_monitoratge.core.http.manager.IgnoreCertificateExpirationTrustManager;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
 
 import org.slf4j.Logger;

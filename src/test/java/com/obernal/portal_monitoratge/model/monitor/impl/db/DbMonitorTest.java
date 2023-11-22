@@ -3,6 +3,7 @@ package com.obernal.portal_monitoratge.model.monitor.impl.db;
 import com.obernal.portal_monitoratge.app.clients.DbConnectionPool;
 import com.obernal.portal_monitoratge.app.service.AlertService;
 import com.obernal.portal_monitoratge.model.alert.Alert;
+import com.obernal.portal_monitoratge.model.alert.AlertContext;
 import com.obernal.portal_monitoratge.model.alert.AlertType;
 import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
@@ -82,12 +83,7 @@ class DbMonitorTest {
     }
 
     private void mockAlert() {
-        when(alertService.alert(any(MonitorContext.class), any(MonitorResult.class), any(List.class))).thenReturn(new Alert(new ArrayList<>()) {
-            @Override
-            public AlertType getType() {
-                return null;
-            }
-        });
+        when(alertService.alert(any(AlertContext.class), any(MonitorResult.class), any(List.class))).thenReturn(new Alert(new ArrayList<>()));
     }
 
     @Test

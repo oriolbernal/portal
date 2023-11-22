@@ -1,5 +1,6 @@
-package com.obernal.portal_monitoratge.app.clients;
+package com.obernal.portal_monitoratge.core.http.manager;
 
+import com.obernal.portal_monitoratge.core.http.manager.IgnoreCertificateExpirationTrustManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

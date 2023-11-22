@@ -30,12 +30,7 @@ class ExecutionTest {
 
     @Test
     void isAlert() {
-        Alert alert = new Alert(List.of("Message1", "Message2")) {
-            @Override
-            public AlertType getType() {
-                return null;
-            }
-        };
+        Alert alert = new Alert(List.of("Message1", "Message2"));
         var execution = new Execution<>(10000, null, alert);
         assertTrue(execution.isAlert());
     }
