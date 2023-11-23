@@ -1,6 +1,5 @@
 package com.obernal.portal_monitoratge.core.http;
 
-import com.obernal.portal_monitoratge.core.http.exception.HttpClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +14,6 @@ public abstract class AbstractHttpApiClient<T> {
     private static final Logger logger = LoggerFactory.getLogger(AbstractHttpApiClient.class);
 
     private static final HttpResponse.BodyHandler<String> STRING_HANDLER = HttpResponse.BodyHandlers.ofString();
-    private static final String GENERIC_ERROR = "Uncontrolled Error";
 
     protected final HttpClient client;
     protected final String endpoint;
@@ -27,11 +25,10 @@ public abstract class AbstractHttpApiClient<T> {
         this.headers = headers;
     }
 
-    protected abstract T convert(String response);
 
     protected HttpRequest.Builder commonRequest(String path) {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
+                .version(version())
                 .uri(URI.create(endpoint + path));
         headers.forEach(builder::header);
         return builder;
@@ -73,20 +70,12 @@ public abstract class AbstractHttpApiClient<T> {
 
     protected CompletableFuture<T> send(HttpRequest request) {
         return client.sendAsync(request, STRING_HANDLER)
-                .thenApply(this::log)
                 .thenApply(this::convert);
     }
 
-    private String log(HttpResponse<String> response) {
-        //logger.debug("Response statusCode is: " + response.statusCode());
-        //logger.debug("Response body is: " + response.body());
-        return switch (response.statusCode()) {
-            case 200, 201 -> response.body();
-            case 401 -> throw new HttpClientException(response.statusCode(), "Not authenticated");
-            case 404 -> throw new HttpClientException(response.statusCode(), "Not found");
-            case 429 -> throw new HttpClientException(response.statusCode(), "Too Many Requests");
-            default -> throw new HttpClientException(response.statusCode(), GENERIC_ERROR + response.body());
-        };
-    }
+    protected abstract HttpClient.Version version();
+
+    protected abstract T convert(HttpResponse<String> response);
+
 
 }

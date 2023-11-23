@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 
 public abstract class JsonRestApiClient extends RestApiClient<JSONObject> {
     private static final Logger logger = LoggerFactory.getLogger(JsonRestApiClient.class);
@@ -16,10 +17,12 @@ public abstract class JsonRestApiClient extends RestApiClient<JSONObject> {
     }
 
     @Override
-    protected JSONObject convert(String response) {
+    protected JSONObject convert(HttpResponse<String> response) {
+        logger.debug("Response statusCode is: " + response.statusCode());
+        logger.debug("Response body is: " + response.body());
         logger.debug("Converting response to json: " + response);
         try {
-            return new JSONObject(response);
+            return new JSONObject(response.body());
         } catch (JSONException e) {
             return new JSONObject();
         }
