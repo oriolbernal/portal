@@ -1,5 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
+import com.obernal.portal_monitoratge.model.notification.ChannelType;
+
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -16,9 +18,10 @@ public class MonitorMetadata {
     private Set<String> labels;
     private String documentation;
     private boolean active;
+    private ChannelType channel;
     private long insistAfter;
 
-    public MonitorMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, long insistAfter) {
+    public MonitorMetadata(String name, String description, String cron, String service, Set<String> labels, String documentation, ChannelType channel, long insistAfter) {
         this.id = UUID.randomUUID().toString();
         created = LocalDateTime.now();
         updated = null;
@@ -29,10 +32,11 @@ public class MonitorMetadata {
         this.labels = labels;
         this.documentation = documentation;
         this.active = true;
+        this.channel = channel;
         this.insistAfter = insistAfter;
     }
 
-    public MonitorMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active, long insistAfter) {
+    public MonitorMetadata(String id, LocalDateTime created, LocalDateTime updated, String name, String description, String cron, String service, Set<String> labels, String documentation, boolean active, ChannelType channel, long insistAfter) {
         this.id = id;
         this.created = created;
         this.updated = updated;
@@ -43,6 +47,7 @@ public class MonitorMetadata {
         this.labels = labels;
         this.documentation = documentation;
         this.active = active;
+        this.channel = channel;
         this.insistAfter = insistAfter;
     }
 
@@ -58,6 +63,7 @@ public class MonitorMetadata {
         this.labels = metadata.getLabels();
         this.documentation = metadata.getDocumentation();
         this.active = metadata.isActive();
+        this.channel = metadata.getChannel();
         this.insistAfter = metadata.getInsistAfter();
         this.updated = LocalDateTime.now();
     }
@@ -100,6 +106,10 @@ public class MonitorMetadata {
 
     public boolean isActive() {
         return active;
+    }
+
+    public ChannelType getChannel() {
+        return channel;
     }
 
     public long getInsistAfter() {

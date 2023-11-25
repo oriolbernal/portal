@@ -1,8 +1,5 @@
 package com.obernal.portal_monitoratge.model.alert;
 
-import com.obernal.portal_monitoratge.app.service.AlertService;
-import com.obernal.portal_monitoratge.model.monitor.MonitorResult;
-
 import java.util.List;
 
 public class Alert {

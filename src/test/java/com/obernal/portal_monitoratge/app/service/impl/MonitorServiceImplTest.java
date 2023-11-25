@@ -5,6 +5,7 @@ import com.obernal.portal_monitoratge.model.monitor.*;
 import com.obernal.portal_monitoratge.app.persistence.MonitorPersistence;
 import com.obernal.portal_monitoratge.app.service.MonitorService;
 import com.obernal.portal_monitoratge.app.service.exception.NotFoundException;
+import com.obernal.portal_monitoratge.model.notification.ChannelType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -155,7 +156,7 @@ class MonitorServiceImplTest {
 class DummyMonitor extends Monitor<DummyContext, DummyResult> {
 
     public DummyMonitor(DummyContext metadata) {
-        super(null, metadata);
+        super(metadata, null);
     }
 
     @Override
@@ -174,12 +175,33 @@ class DummyContext extends MonitorContext {
     private final double random;
 
     public DummyContext(String name, String cron) {
-        super(new MonitorMetadata(name, "description", cron, "service", new HashSet<>(), "documentation", 0));
+        super(new MonitorMetadata(
+                name,
+                "description",
+                cron,
+                "service",
+                new HashSet<>(),
+                "documentation",
+                ChannelType.EMAIL,
+                0
+                //new EmailNotifier(null, 0, null, null, null)
+        ));
         random = Math.random(); // greater than or equal to 0.0 and less than 1.0
     }
 
     public DummyContext(String name, String cron, boolean active) {
-        super(new MonitorMetadata(name, "description", cron, "service", new HashSet<>(), "documentation", 0));
+        super(
+                new MonitorMetadata(
+                        name,
+                        "description",
+                        cron,
+                        "service",
+                        new HashSet<>(),
+                        "documentation",
+                        ChannelType.EMAIL,
+                        0
+                        //new EmailNotifier(null, 0, null, null, null)
+                ));
         if(!active) toggle();
         random = Math.random(); // greater than or equal to 0.0 and less than 1.0
     }

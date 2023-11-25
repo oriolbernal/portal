@@ -3,11 +3,11 @@ package com.obernal.portal_monitoratge.model.monitor.impl.db;
 import com.obernal.portal_monitoratge.app.clients.DbConnectionPool;
 import com.obernal.portal_monitoratge.app.service.AlertService;
 import com.obernal.portal_monitoratge.model.alert.Alert;
-import com.obernal.portal_monitoratge.model.alert.AlertContext;
-import com.obernal.portal_monitoratge.model.alert.AlertType;
 import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
 import com.obernal.portal_monitoratge.model.monitor.MonitorResult;
+import com.obernal.portal_monitoratge.model.notification.ChannelType;
+import com.obernal.portal_monitoratge.model.notification.impl.email.EmailNotifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -83,7 +83,7 @@ class DbMonitorTest {
     }
 
     private void mockAlert() {
-        when(alertService.alert(any(AlertContext.class), any(MonitorResult.class), any(List.class))).thenReturn(new Alert(new ArrayList<>()));
+        when(alertService.alert(any(MonitorContext.class), any(MonitorResult.class), any(List.class))).thenReturn(new Alert(new ArrayList<>()));
     }
 
     @Test
@@ -128,7 +128,6 @@ class DbMonitorTest {
 
     private DbMonitor createMonitor(Long min, Long max, String word) {
         return new DbMonitor(
-                alertService,
                 new DbContext(
                         new MonitorMetadata(
                                 "name",
@@ -137,13 +136,17 @@ class DbMonitorTest {
                                 "service",
                                 new HashSet<>(),
                                 "docs",
-                                0),
+                                ChannelType.EMAIL,
+                                0
+                                //new EmailNotifier(null, 0, null, null, null)
+                        ),
                         "testDatasource",
                         "testQuery",
                         min,
                         max,
                         word
                 ),
+                new EmailNotifier(null, 0, null, null, null),
                 connectionPool);
     }
 

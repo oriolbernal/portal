@@ -7,6 +7,7 @@ import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpContext;
 import com.obernal.portal_monitoratge.model.monitor.impl.http.HttpMonitor;
 import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslContext;
 import com.obernal.portal_monitoratge.model.monitor.impl.ssl.SslMonitor;
+import com.obernal.portal_monitoratge.model.notification.NotifierFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,8 @@ class MonitorFactoryTest {
     void setUp() {
         Properties properties = mock(Properties.class);
         DbConnectionPool connectionPool = mock(DbConnectionPool.class);
-        factory = new MonitorFactory(properties, null, connectionPool);
+        NotifierFactory notifierFactory = mock(NotifierFactory.class);
+        factory = new MonitorFactory(notifierFactory, properties, connectionPool);
     }
 
     @Test

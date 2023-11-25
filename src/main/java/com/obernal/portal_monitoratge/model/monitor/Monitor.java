@@ -1,10 +1,8 @@
 package com.obernal.portal_monitoratge.model.monitor;
 
-import com.obernal.portal_monitoratge.app.service.AlertService;
 import com.obernal.portal_monitoratge.model.alert.Alert;
-import com.obernal.portal_monitoratge.model.alert.AlertContext;
-import com.obernal.portal_monitoratge.model.alert.AlertFactory;
 import com.obernal.portal_monitoratge.model.execution.Execution;
+import com.obernal.portal_monitoratge.model.notification.Notifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,11 +12,15 @@ public abstract class Monitor<C extends MonitorContext, R extends MonitorResult>
     private static final Logger logger = LoggerFactory.getLogger(Monitor.class);
 
     protected final C context;
-    private final AlertService alertService;
+    private final Notifier<R> notifier;
+    protected MonitorState state;
+    protected long counter;
 
-    protected Monitor(AlertService alertService, C context) {
-        this.alertService = alertService;
+    protected Monitor(C context, Notifier<R> notifier) {
         this.context = context;
+        this.notifier = notifier;
+        this.state = MonitorState.OK;
+        this.counter = 0;
     }
 
     public String getId() {
@@ -31,7 +33,7 @@ public abstract class Monitor<C extends MonitorContext, R extends MonitorResult>
         try {
             R result = perform();
             List<String> messages = getAlerts(result);
-            context.changeState(!messages.isEmpty());
+            changeState(!messages.isEmpty());
             Alert alert = computeAlert(result, messages);
             return new Execution<>(start, result, alert);
         } catch (Exception exception) {
@@ -45,22 +47,56 @@ public abstract class Monitor<C extends MonitorContext, R extends MonitorResult>
     protected abstract List<String> getAlerts(R result) throws Exception;
 
     public MonitorState getState() {
-        return context.state;
+        return state;
     }
 
     private Alert computeAlert(R result, List<String> messages) {
         logger.info("Sending notification for monitor: " + getId());
-        if(messages.isEmpty()) return null;
-        return new Alert(messages);
-        /*
-        Alert<AlertContext, R> alert = new AlertFactory(null).create(context.notification);
-        return switch (context.state) {
-            case FIRST_ALERT -> alert.alert(result, messages);
-            case INSIST -> alert.insist(result, messages);
-            case RECOVERY -> alert.recover(result);
+        return switch (state) {
+            case FIRST_ALERT -> notifier.alert(result, messages);
+            case INSIST -> notifier.insist(result);
+            case RECOVERY -> notifier.recover(result);
             case OK, ALERT -> null;
         };
-         */
+    }
+
+    public void changeState(boolean alert) {
+        if (alert) {
+            changeStateAfterAlert();
+        } else {
+            changeStateAfterOk();
+        }
+    }
+
+    private void changeStateAfterAlert() {
+        switch (state) {
+            case OK, RECOVERY -> {
+                state = MonitorState.FIRST_ALERT;
+                counter = 1;
+            }
+            case FIRST_ALERT, ALERT, INSIST -> {
+                state = mustInsist() ? MonitorState.INSIST : MonitorState.ALERT;
+                counter++;
+            }
+        }
+    }
+
+    private void changeStateAfterOk() {
+        switch (state) {
+            case OK, RECOVERY -> {
+                state = MonitorState.OK;
+                counter++;
+            }
+            case FIRST_ALERT, ALERT, INSIST -> {
+                state = MonitorState.RECOVERY;
+                counter = 1;
+            }
+        }
+    }
+
+    private boolean mustInsist() {
+        long insistAfter = notifier.getInsistAfter();
+        return insistAfter == 0 || (counter+1) % insistAfter == 0;
     }
 
 }

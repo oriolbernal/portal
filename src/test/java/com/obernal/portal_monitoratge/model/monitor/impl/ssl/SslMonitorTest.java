@@ -1,6 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.ssl;
 
 import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
+import com.obernal.portal_monitoratge.model.notification.ChannelType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +53,6 @@ class SslMonitorTest {
 
     private SslMonitor createMonitor(String endpoint, String[] sslProtocols) {
         return new SslMonitor(
-                null,
                 new SslContext(
                         new MonitorMetadata(
                                 "name",
@@ -61,7 +61,10 @@ class SslMonitorTest {
                                 "service",
                                 new HashSet<>(),
                                 "docs",
-                                0),
+                                ChannelType.EMAIL,
+                                0
+                                //new EmailNotifier(null, 0, null, null, null)
+                        ),
                         endpoint,
                         1,
                         HttpClient.Version.HTTP_2,
@@ -69,6 +72,7 @@ class SslMonitorTest {
                         false,
                         0
                 ),
+                null,
                 testProperties);
     }
 

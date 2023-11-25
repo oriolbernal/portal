@@ -1,35 +1,24 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
-import com.obernal.portal_monitoratge.app.service.AlertService;
-import com.obernal.portal_monitoratge.model.alert.Alert;
-import com.obernal.portal_monitoratge.model.alert.AlertContext;
-import com.obernal.portal_monitoratge.model.alert.AlertType;
-import com.obernal.portal_monitoratge.model.monitor.MonitorContext;
 import com.obernal.portal_monitoratge.model.monitor.MonitorMetadata;
-import com.obernal.portal_monitoratge.model.monitor.MonitorResult;
+import com.obernal.portal_monitoratge.model.notification.ChannelType;
+import com.obernal.portal_monitoratge.model.notification.impl.email.EmailNotifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.net.http.HttpClient;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class HttpMonitorTest {
 
-    private AlertService alertService;
     private Properties testProperties;
 
     @BeforeEach
     public void setUp() throws Exception {
-        alertService = mock(AlertService.class);
         testProperties = loadTestProperties();
     }
 
@@ -269,7 +258,6 @@ class HttpMonitorTest {
 
     private HttpMonitor createMonitor(String endpoint, String[] sslProtocols, boolean clientCertificate, int statusCode) {
         return new HttpMonitor(
-                alertService,
                 new HttpContext(
                         new MonitorMetadata(
                                 "name",
@@ -278,7 +266,10 @@ class HttpMonitorTest {
                                 "service",
                                 new HashSet<>(),
                                 "docs",
-                                0),
+                                ChannelType.EMAIL,
+                                0
+                                //new EmailNotifier(null, 0, null, null, null)
+                        ),
                         endpoint,
                         HttpContext.RequestMethod.GET,
                         null,
@@ -291,12 +282,12 @@ class HttpMonitorTest {
                         null,
                         false
                 ),
+                new EmailNotifier(null, 0, null, null, null),
                 testProperties);
     }
 
     private HttpMonitor createPostMonitor(String endpoint, String body, String expectedBody, boolean strict) {
         return new HttpMonitor(
-                alertService,
                 new HttpContext(
                         new MonitorMetadata(
                                 "name",
@@ -305,7 +296,10 @@ class HttpMonitorTest {
                                 "service",
                                 new HashSet<>(),
                                 "docs",
-                                0),
+                                ChannelType.EMAIL,
+                                0
+                                //new EmailNotifier(null, 0, null, null, null)
+                        ),
                         endpoint,
                         HttpContext.RequestMethod.POST,
                         body,
@@ -318,6 +312,7 @@ class HttpMonitorTest {
                         expectedBody,
                         strict
                 ),
+                new EmailNotifier(null, 0, null, null, null),
                 testProperties);
     }
 

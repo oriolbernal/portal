@@ -1,7 +1,7 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.http;
 
-import com.obernal.portal_monitoratge.app.service.AlertService;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
+import com.obernal.portal_monitoratge.model.notification.Notifier;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -26,8 +26,8 @@ import java.util.Properties;
 public class HttpMonitor extends Monitor<HttpContext, HttpResult> {
     private static final Logger logger = LoggerFactory.getLogger(HttpMonitor.class);
     private final Properties properties;
-    public HttpMonitor(AlertService alertService, HttpContext context, Properties properties) {
-        super(alertService, context);
+    public HttpMonitor(HttpContext context, Notifier<HttpResult> notifier, Properties properties) {
+        super(context, notifier);
         this.properties = properties;
     }
 

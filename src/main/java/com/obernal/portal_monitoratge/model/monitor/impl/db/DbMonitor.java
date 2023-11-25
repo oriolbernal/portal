@@ -1,8 +1,8 @@
 package com.obernal.portal_monitoratge.model.monitor.impl.db;
 
-import com.obernal.portal_monitoratge.app.service.AlertService;
 import com.obernal.portal_monitoratge.model.monitor.Monitor;
 import com.obernal.portal_monitoratge.app.clients.DbConnectionPool;
+import com.obernal.portal_monitoratge.model.notification.Notifier;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -15,8 +15,8 @@ public class DbMonitor extends Monitor<DbContext, DbResult> {
 
     private final DbConnectionPool connectionPool;
 
-    public DbMonitor(AlertService alertService, DbContext context, DbConnectionPool connectionPool) {
-        super(alertService, context);
+    public DbMonitor(DbContext context, Notifier<DbResult> notifier, DbConnectionPool connectionPool) {
+        super(context, notifier);
         this.connectionPool = connectionPool;
     }
 
